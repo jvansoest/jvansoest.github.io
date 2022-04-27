@@ -1,6 +1,5 @@
 {
   "devDependencies": {
-    "@babel/preset-react": "^7.16.7",
     "http-server": "^14.1.0",
     "ts-loader": "^9.2.9",
     "typescript": "^4.6.3",
@@ -9,9 +8,5 @@
   },
   "dependencies": {
     "sql.js-httpvfs": "^0.8.11"
-  },
-  "presets": [
-    "@babel/preset-env",
-    "@babel/preset-react"
-  ]
+  }
 }
