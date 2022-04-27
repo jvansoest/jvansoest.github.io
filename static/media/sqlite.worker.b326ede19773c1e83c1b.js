@@ -7,90 +7,62 @@
     for (var n in r) ("object" == typeof exports ? exports : e)[n] = r[n];
   }
 })(this, function () {
-  return (function () {
+  return (() => {
     var __webpack_modules__ = {
-        870: function (e, t, r) {
+        870: (e, t, r) => {
           "use strict";
           r.r(t),
             r.d(t, {
-              createEndpoint: function () {
-                return o;
-              },
-              expose: function () {
-                return l;
-              },
-              proxy: function () {
-                return v;
-              },
-              proxyMarker: function () {
-                return n;
-              },
-              releaseProxy: function () {
-                return i;
-              },
-              transfer: function () {
-                return _;
-              },
-              transferHandlers: function () {
-                return u;
-              },
-              windowEndpoint: function () {
-                return g;
-              },
-              wrap: function () {
-                return f;
-              },
+              createEndpoint: () => o,
+              expose: () => l,
+              proxy: () => g,
+              proxyMarker: () => n,
+              releaseProxy: () => i,
+              transfer: () => _,
+              transferHandlers: () => u,
+              windowEndpoint: () => v,
+              wrap: () => f,
             });
-          var n = Symbol("Comlink.proxy"),
+          const n = Symbol("Comlink.proxy"),
             o = Symbol("Comlink.endpoint"),
             i = Symbol("Comlink.releaseProxy"),
-            a = Symbol("Comlink.thrown"),
-            s = function (e) {
-              return (
-                ("object" == typeof e && null !== e) || "function" == typeof e
-              );
-            },
+            s = Symbol("Comlink.thrown"),
+            a = (e) =>
+              ("object" == typeof e && null !== e) || "function" == typeof e,
             u = new Map([
               [
                 "proxy",
                 {
-                  canHandle: function (e) {
-                    return s(e) && e[n];
+                  canHandle: (e) => a(e) && e[n],
+                  serialize(e) {
+                    const { port1: t, port2: r } = new MessageChannel();
+                    return l(e, t), [r, [r]];
                   },
-                  serialize: function (e) {
-                    var t = new MessageChannel(),
-                      r = t.port1,
-                      n = t.port2;
-                    return l(e, r), [n, [n]];
-                  },
-                  deserialize: function (e) {
-                    return e.start(), f(e);
-                  },
+                  deserialize: (e) => (e.start(), f(e)),
                 },
               ],
               [
                 "throw",
                 {
-                  canHandle: function (e) {
-                    return s(e) && a in e;
+                  canHandle: (e) => a(e) && s in e,
+                  serialize({ value: e }) {
+                    let t;
+                    return (
+                      (t =
+                        e instanceof Error
+                          ? {
+                              isError: !0,
+                              value: {
+                                message: e.message,
+                                name: e.name,
+                                stack: e.stack,
+                              },
+                            }
+                          : { isError: !1, value: e }),
+                      [t, []]
+                    );
                   },
-                  serialize: function (e) {
-                    var t = e.value;
-                    return [
-                      t instanceof Error
-                        ? {
-                            isError: !0,
-                            value: {
-                              message: t.message,
-                              name: t.name,
-                              stack: t.stack,
-                            },
-                          }
-                        : { isError: !1, value: t },
-                      [],
-                    ];
-                  },
-                  deserialize: function (e) {
+                  deserialize(e) {
                     if (e.isError)
                       throw Object.assign(new Error(e.value.message), e.value);
                     throw e.value;
@@ -98,67 +70,54 @@
                 },
               ],
             ]);
-          function l(e) {
-            var t =
-              arguments.length > 1 && void 0 !== arguments[1]
-                ? arguments[1]
-                : self;
+          function l(e, t = self) {
             t.addEventListener("message", function r(n) {
-              if (n && n.data) {
-                var o,
-                  i = Object.assign({ path: [] }, n.data),
-                  s = i.id,
-                  u = i.type,
-                  f = i.path,
-                  d = (n.data.argumentList || []).map(b);
-                try {
-                  var h = f.slice(0, -1).reduce(function (e, t) {
-                      return e[t];
-                    }, e),
-                    p = f.reduce(function (e, t) {
-                      return e[t];
-                    }, e);
-                  switch (u) {
-                    case 0:
-                      o = p;
-                      break;
-                    case 1:
-                      (h[f.slice(-1)[0]] = b(n.data.value)), (o = !0);
-                      break;
-                    case 2:
-                      o = p.apply(h, d);
-                      break;
-                    case 3:
-                      o = v(_construct(p, _toConsumableArray(d)));
-                      break;
-                    case 4:
-                      var m = new MessageChannel(),
-                        g = m.port1,
-                        w = m.port2;
-                      l(e, w), (o = _(g, [g]));
-                      break;
-                    case 5:
-                      o = void 0;
-                  }
-                } catch (e) {
-                  o = _defineProperty({ value: e }, a, 0);
+              if (!n || !n.data) return;
+              const {
+                  id: o,
+                  type: i,
+                  path: a,
+                } = Object.assign({ path: [] }, n.data),
+                u = (n.data.argumentList || []).map(b);
+              let f;
+              try {
+                const t = a.slice(0, -1).reduce((e, t) => e[t], e),
+                  r = a.reduce((e, t) => e[t], e);
+                switch (i) {
+                  case 0:
+                    f = r;
+                    break;
+                  case 1:
+                    (t[a.slice(-1)[0]] = b(n.data.value)), (f = !0);
+                    break;
+                  case 2:
+                    f = r.apply(t, u);
+                    break;
+                  case 3:
+                    f = g(new r(...u));
+                    break;
+                  case 4:
+                    {
+                      const { port1: t, port2: r } = new MessageChannel();
+                      l(e, r), (f = _(t, [t]));
+                    }
+                    break;
+                  case 5:
+                    f = void 0;
                 }
-                Promise.resolve(o)
-                  .catch(function (e) {
-                    return _defineProperty({ value: e }, a, 0);
-                  })
-                  .then(function (e) {
-                    var n = y(e),
-                      o = _slicedToArray(n, 2),
-                      i = o[0],
-                      a = o[1];
-                    t.postMessage(
-                      Object.assign(Object.assign({}, i), { id: s }),
-                      a
-                    ),
-                      5 === u && (t.removeEventListener("message", r), c(t));
-                  });
+              } catch (e) {
+                f = { value: e, [s]: 0 };
               }
+              Promise.resolve(f)
+                .catch((e) => ({ value: e, [s]: 0 }))
+                .then((e) => {
+                  const [n, s] = y(e);
+                  t.postMessage(
+                    Object.assign(Object.assign({}, n), { id: o }),
+                    s
+                  ),
+                    5 === i && (t.removeEventListener("message", r), c(t));
+                });
             }),
               t.start && t.start();
           }
@@ -174,164 +133,100 @@
             if (e)
               throw new Error("Proxy has been released and is not useable");
           }
-          function h(e) {
-            var t =
-                arguments.length > 1 && void 0 !== arguments[1]
-                  ? arguments[1]
-                  : [],
-              r =
-                arguments.length > 2 && void 0 !== arguments[2]
-                  ? arguments[2]
-                  : function () {},
-              n = !1,
-              a = new Proxy(r, {
-                get: function (r, o) {
-                  if ((d(n), o === i))
-                    return function () {
-                      return w(e, {
-                        type: 5,
-                        path: t.map(function (e) {
-                          return e.toString();
-                        }),
-                      }).then(function () {
+          function h(e, t = [], r = function () {}) {
+            let n = !1;
+            const s = new Proxy(r, {
+              get(r, o) {
+                if ((d(n), o === i))
+                  return () =>
+                    w(e, { type: 5, path: t.map((e) => e.toString()) }).then(
+                      () => {
                         c(e), (n = !0);
-                      });
-                    };
-                  if ("then" === o) {
-                    if (0 === t.length)
-                      return {
-                        then: function () {
-                          return a;
-                        },
-                      };
-                    var s = w(e, {
-                      type: 0,
-                      path: t.map(function (e) {
-                        return e.toString();
-                      }),
-                    }).then(b);
-                    return s.then.bind(s);
-                  }
-                  return h(e, [].concat(_toConsumableArray(t), [o]));
-                },
-                set: function (r, o, i) {
-                  d(n);
-                  var a = y(i),
-                    s = _slicedToArray(a, 2),
-                    u = s[0],
-                    l = s[1];
-                  return w(
-                    e,
-                    {
-                      type: 1,
-                      path: []
-                        .concat(_toConsumableArray(t), [o])
-                        .map(function (e) {
-                          return e.toString();
-                        }),
-                      value: u,
-                    },
-                    l
-                  ).then(b);
-                },
-                apply: function (r, i, a) {
-                  d(n);
-                  var s = t[t.length - 1];
-                  if (s === o) return w(e, { type: 4 }).then(b);
-                  if ("bind" === s) return h(e, t.slice(0, -1));
-                  var u = p(a),
-                    l = _slicedToArray(u, 2),
-                    c = l[0],
-                    f = l[1];
-                  return w(
-                    e,
-                    {
-                      type: 2,
-                      path: t.map(function (e) {
-                        return e.toString();
-                      }),
-                      argumentList: c,
-                    },
-                    f
-                  ).then(b);
-                },
-                construct: function (r, o) {
-                  d(n);
-                  var i = p(o),
-                    a = _slicedToArray(i, 2),
-                    s = a[0],
-                    u = a[1];
-                  return w(
-                    e,
-                    {
-                      type: 3,
-                      path: t.map(function (e) {
-                        return e.toString();
-                      }),
-                      argumentList: s,
-                    },
-                    u
-                  ).then(b);
-                },
-              });
-            return a;
+                      }
+                    );
+                if ("then" === o) {
+                  if (0 === t.length) return { then: () => s };
+                  const r = w(e, {
+                    type: 0,
+                    path: t.map((e) => e.toString()),
+                  }).then(b);
+                  return r.then.bind(r);
+                }
+                return h(e, [...t, o]);
+              },
+              set(r, o, i) {
+                d(n);
+                const [s, a] = y(i);
+                return w(
+                  e,
+                  {
+                    type: 1,
+                    path: [...t, o].map((e) => e.toString()),
+                    value: s,
+                  },
+                  a
+                ).then(b);
+              },
+              apply(r, i, s) {
+                d(n);
+                const a = t[t.length - 1];
+                if (a === o) return w(e, { type: 4 }).then(b);
+                if ("bind" === a) return h(e, t.slice(0, -1));
+                const [u, l] = p(s);
+                return w(
+                  e,
+                  {
+                    type: 2,
+                    path: t.map((e) => e.toString()),
+                    argumentList: u,
+                  },
+                  l
+                ).then(b);
+              },
+              construct(r, o) {
+                d(n);
+                const [i, s] = p(o);
+                return w(
+                  e,
+                  {
+                    type: 3,
+                    path: t.map((e) => e.toString()),
+                    argumentList: i,
+                  },
+                  s
+                ).then(b);
+              },
+            });
+            return s;
           }
           function p(e) {
-            var t,
-              r = e.map(y);
+            const t = e.map(y);
             return [
-              r.map(function (e) {
-                return e[0];
-              }),
-              ((t = r.map(function (e) {
-                return e[1];
-              })),
-              Array.prototype.concat.apply([], t)),
+              t.map((e) => e[0]),
+              ((r = t.map((e) => e[1])), Array.prototype.concat.apply([], r)),
             ];
+            var r;
           }
-          var m = new WeakMap();
+          const m = new WeakMap();
           function _(e, t) {
             return m.set(e, t), e;
           }
-          function v(e) {
-            return Object.assign(e, _defineProperty({}, n, !0));
-          }
           function g(e) {
-            var t =
-                arguments.length > 1 && void 0 !== arguments[1]
-                  ? arguments[1]
-                  : self,
-              r =
-                arguments.length > 2 && void 0 !== arguments[2]
-                  ? arguments[2]
-                  : "*";
+            return Object.assign(e, { [n]: !0 });
+          }
+          function v(e, t = self, r = "*") {
             return {
-              postMessage: function (t, n) {
-                return e.postMessage(t, r, n);
-              },
+              postMessage: (t, n) => e.postMessage(t, r, n),
               addEventListener: t.addEventListener.bind(t),
               removeEventListener: t.removeEventListener.bind(t),
             };
           }
           function y(e) {
-            var t,
-              r = _createForOfIteratorHelper(u);
-            try {
-              for (r.s(); !(t = r.n()).done; ) {
-                var n = _slicedToArray(t.value, 2),
-                  o = n[0],
-                  i = n[1];
-                if (i.canHandle(e)) {
-                  var a = i.serialize(e),
-                    s = _slicedToArray(a, 2);
-                  return [{ type: 3, name: o, value: s[0] }, s[1]];
-                }
+            for (const [t, r] of u)
+              if (r.canHandle(e)) {
+                const [n, o] = r.serialize(e);
+                return [{ type: 3, name: t, value: n }, o];
               }
-            } catch (l) {
-              r.e(l);
-            } finally {
-              r.f();
-            }
             return [{ type: 0, value: e }, m.get(e) || []];
           }
           function b(e) {
@@ -343,14 +238,14 @@
             }
           }
           function w(e, t, r) {
-            return new Promise(function (n) {
-              var o = new Array(4)
+            return new Promise((n) => {
+              const o = new Array(4)
                 .fill(0)
-                .map(function () {
-                  return Math.floor(
-                    Math.random() * Number.MAX_SAFE_INTEGER
-                  ).toString(16);
-                })
+                .map(() =>
+                  Math.floor(Math.random() * Number.MAX_SAFE_INTEGER).toString(
+                    16
+                  )
+                )
                 .join("-");
               e.addEventListener("message", function t(r) {
                 r.data &&
@@ -363,266 +258,190 @@
             });
           }
         },
-        794: function (e, t) {
+        794: (e, t) => {
           "use strict";
           Object.defineProperty(t, "__esModule", { value: !0 }),
             (t.createLazyFile = t.LazyUint8Array = void 0);
-          var r = (function () {
-            function e(t) {
-              var r, n;
-              _classCallCheck(this, e),
-                (this.serverChecked = !1),
+          class r {
+            constructor(e) {
+              (this.serverChecked = !1),
                 (this.chunks = []),
                 (this.totalFetchedBytes = 0),
                 (this.totalRequests = 0),
                 (this.readPages = []),
                 (this.readHeads = []),
                 (this.lastGet = -1),
-                (this._chunkSize = t.requestChunkSize),
+                (this._chunkSize = e.requestChunkSize),
                 (this.maxSpeed = Math.round(
-                  (t.maxReadSpeed || 5242880) / this._chunkSize
+                  (e.maxReadSpeed || 5242880) / this._chunkSize
                 )),
-                (this.maxReadHeads =
-                  null !== (r = t.maxReadHeads) && void 0 !== r ? r : 3),
-                (this.rangeMapper = t.rangeMapper),
-                (this.logPageReads =
-                  null !== (n = t.logPageReads) && void 0 !== n && n),
-                t.fileLength && (this._length = t.fileLength);
+                (this.maxReadHeads = e.maxReadHeads ?? 3),
+                (this.rangeMapper = e.rangeMapper),
+                (this.logPageReads = e.logPageReads ?? !1),
+                e.fileLength && (this._length = e.fileLength);
             }
-            return (
-              _createClass(e, [
-                {
-                  key: "copyInto",
-                  value: function (e, t, r, n) {
-                    if (n >= this.length) return 0;
-                    for (
-                      var o = n + (r = Math.min(this.length - n, r)), i = 0;
-                      i < r;
+            copyInto(e, t, r, n) {
+              if (n >= this.length) return 0;
+              const o = n + (r = Math.min(this.length - n, r));
+              let i = 0;
+              for (; i < r; ) {
+                const r = n + i,
+                  s = r % this.chunkSize,
+                  a = (r / this.chunkSize) | 0,
+                  u = Math.min(this.chunkSize, o - r);
+                let l = this.getChunk(a);
+                (0 === s && u === this.chunkSize) || (l = l.subarray(s, s + u)),
+                  e.set(l, t + i),
+                  (i += l.length);
+              }
+              return r;
+            }
+            moveReadHead(e) {
+              for (const [t, r] of this.readHeads.entries()) {
+                const n = r.startChunk + r.speed,
+                  o = Math.min(this.maxSpeed, 2 * r.speed);
+                if (e >= n && e < n + o)
+                  return (
+                    (r.speed = o),
+                    (r.startChunk = n),
+                    0 !== t &&
+                      (this.readHeads.splice(t, 1), this.readHeads.unshift(r)),
+                    r
+                  );
+              }
+              const t = { startChunk: e, speed: 1 };
+              for (
+                this.readHeads.unshift(t);
+                this.readHeads.length > this.maxReadHeads;
 
-                    ) {
-                      var a = n + i,
-                        s = a % this.chunkSize,
-                        u = (a / this.chunkSize) | 0,
-                        l = Math.min(this.chunkSize, o - a),
-                        c = this.getChunk(u);
-                      (0 === s && l === this.chunkSize) ||
-                        (c = c.subarray(s, s + l)),
-                        e.set(c, t + i),
-                        (i += c.length);
-                    }
-                    return r;
-                  },
-                },
-                {
-                  key: "moveReadHead",
-                  value: function (e) {
-                    var t,
-                      r = _createForOfIteratorHelper(this.readHeads.entries());
-                    try {
-                      for (r.s(); !(t = r.n()).done; ) {
-                        var n = _slicedToArray(t.value, 2),
-                          o = n[0],
-                          i = n[1],
-                          a = i.startChunk + i.speed,
-                          s = Math.min(this.maxSpeed, 2 * i.speed);
-                        if (e >= a && e < a + s)
-                          return (
-                            (i.speed = s),
-                            (i.startChunk = a),
-                            0 !== o &&
-                              (this.readHeads.splice(o, 1),
-                              this.readHeads.unshift(i)),
-                            i
-                          );
-                      }
-                    } catch (l) {
-                      r.e(l);
-                    } finally {
-                      r.f();
-                    }
-                    var u = { startChunk: e, speed: 1 };
-                    for (
-                      this.readHeads.unshift(u);
-                      this.readHeads.length > this.maxReadHeads;
-
-                    )
-                      this.readHeads.pop();
-                    return u;
-                  },
-                },
-                {
-                  key: "getChunk",
-                  value: function (e) {
-                    var t = !0;
-                    if (void 0 === this.chunks[e]) {
-                      t = !1;
-                      var r = this.moveReadHead(e),
-                        n = r.speed,
-                        o = r.startChunk * this.chunkSize,
-                        i = (r.startChunk + n) * this.chunkSize - 1;
-                      i = Math.min(i, this.length - 1);
-                      for (var a = this.doXHR(o, i), s = 0; s < n; s++) {
-                        var u = r.startChunk + s;
-                        if (s * this.chunkSize >= a.byteLength) break;
-                        var l =
-                          (s + 1) * this.chunkSize > a.byteLength
-                            ? a.byteLength - s * this.chunkSize
-                            : this.chunkSize;
-                        this.chunks[u] = new Uint8Array(
-                          a,
-                          s * this.chunkSize,
-                          l
-                        );
-                      }
-                    }
-                    if (void 0 === this.chunks[e])
-                      throw new Error("doXHR failed (bug)!");
-                    return (
-                      !this.logPageReads ||
-                        this.lastGet == e ||
-                        ((this.lastGet = e),
-                        this.readPages.push({
-                          pageno: e,
-                          wasCached: t,
-                          prefetch: t ? 0 : this.readHeads[0].speed - 1,
-                        })),
-                      this.chunks[e]
-                    );
-                  },
-                },
-                {
-                  key: "checkServer",
-                  value: function () {
-                    var e = new XMLHttpRequest(),
-                      t = this.rangeMapper(0, 0).url;
-                    if (
-                      (e.open("HEAD", t, !1),
-                      e.send(null),
-                      !(
-                        (e.status >= 200 && e.status < 300) ||
-                        304 === e.status
-                      ))
-                    )
-                      throw new Error(
-                        "Couldn't load " + t + ". Status: " + e.status
-                      );
-                    var r = Number(e.getResponseHeader("Content-length")),
-                      n = "bytes" === e.getResponseHeader("Accept-Ranges"),
-                      o = e.getResponseHeader("Content-Encoding"),
-                      i = o && "identity" !== o;
-                    if (!n) {
-                      console.warn(
-                        "Warning: The server did not respond with Accept-Ranges=bytes. It either does not support byte serving or does not advertise it (`Accept-Ranges: bytes` header missing), or your database is hosted on CORS and the server doesn't mark the accept-ranges header as exposed. This may lead to incorrect results.",
-                        "(seen response headers:",
-                        e.getAllResponseHeaders(),
-                        ")"
-                      );
-                    }
-                    if (
-                      (i &&
-                        console.warn(
-                          "Warning: The server responded with ".concat(
-                            o,
-                            " encoding to a HEAD request. Ignoring since it may not do so for Range HTTP requests, but this will lead to incorrect results otherwise since the ranges will be based on the compressed data instead of the uncompressed data."
-                          )
-                        ),
-                      i && (r = null),
-                      !this._length)
-                    ) {
-                      if (!r)
-                        throw (
-                          (console.error(
-                            "response headers",
-                            e.getAllResponseHeaders()
-                          ),
-                          Error(
-                            "Length of the file not known. It must either be supplied in the config or given by the HTTP server."
-                          ))
-                        );
-                      this._length = r;
-                    }
-                    this.serverChecked = !0;
-                  },
-                },
-                {
-                  key: "length",
-                  get: function () {
-                    return (
-                      this.serverChecked || this.checkServer(), this._length
-                    );
-                  },
-                },
-                {
-                  key: "chunkSize",
-                  get: function () {
-                    return (
-                      this.serverChecked || this.checkServer(), this._chunkSize
-                    );
-                  },
-                },
-                {
-                  key: "doXHR",
-                  value: function (e, t) {
-                    if (
-                      (console.log(
-                        "[xhr of size "
-                          .concat((t + 1 - e) / 1024, " KiB @ ")
-                          .concat(e / 1024, " KiB]")
-                      ),
-                      (this.totalFetchedBytes += t - e),
-                      this.totalRequests++,
-                      e > t)
-                    )
-                      throw new Error(
-                        "invalid range (" +
-                          e +
-                          ", " +
-                          t +
-                          ") or no bytes requested!"
-                      );
-                    if (t > this.length - 1)
-                      throw new Error(
-                        "only " +
-                          this.length +
-                          " bytes available! programmer error!"
-                      );
-                    var r = this.rangeMapper(e, t),
-                      n = r.fromByte,
-                      o = r.toByte,
-                      i = r.url,
-                      a = new XMLHttpRequest();
-                    if (
-                      (a.open("GET", i, !1),
-                      this.length !== this.chunkSize &&
-                        a.setRequestHeader("Range", "bytes=" + n + "-" + o),
-                      (a.responseType = "arraybuffer"),
-                      a.overrideMimeType &&
-                        a.overrideMimeType(
-                          "text/plain; charset=x-user-defined"
-                        ),
-                      a.send(null),
-                      !(
-                        (a.status >= 200 && a.status < 300) ||
-                        304 === a.status
-                      ))
-                    )
-                      throw new Error(
-                        "Couldn't load " + i + ". Status: " + a.status
-                      );
-                    if (void 0 !== a.response) return a.response;
-                    throw Error("xhr did not return uint8array");
-                  },
-                },
-              ]),
-              e
-            );
-          })();
+              )
+                this.readHeads.pop();
+              return t;
+            }
+            getChunk(e) {
+              let t = !0;
+              if (void 0 === this.chunks[e]) {
+                t = !1;
+                const r = this.moveReadHead(e),
+                  n = r.speed,
+                  o = r.startChunk * this.chunkSize;
+                let i = (r.startChunk + n) * this.chunkSize - 1;
+                i = Math.min(i, this.length - 1);
+                const s = this.doXHR(o, i);
+                for (let e = 0; e < n; e++) {
+                  const t = r.startChunk + e;
+                  if (e * this.chunkSize >= s.byteLength) break;
+                  const n =
+                    (e + 1) * this.chunkSize > s.byteLength
+                      ? s.byteLength - e * this.chunkSize
+                      : this.chunkSize;
+                  this.chunks[t] = new Uint8Array(s, e * this.chunkSize, n);
+                }
+              }
+              if (void 0 === this.chunks[e])
+                throw new Error("doXHR failed (bug)!");
+              return (
+                !this.logPageReads ||
+                  this.lastGet == e ||
+                  ((this.lastGet = e),
+                  this.readPages.push({
+                    pageno: e,
+                    wasCached: t,
+                    prefetch: t ? 0 : this.readHeads[0].speed - 1,
+                  })),
+                this.chunks[e]
+              );
+            }
+            checkServer() {
+              var e = new XMLHttpRequest();
+              const t = this.rangeMapper(0, 0).url;
+              if (
+                (e.open("HEAD", t, !1),
+                e.send(null),
+                !((e.status >= 200 && e.status < 300) || 304 === e.status))
+              )
+                throw new Error("Couldn't load " + t + ". Status: " + e.status);
+              var r = Number(e.getResponseHeader("Content-length")),
+                n = "bytes" === e.getResponseHeader("Accept-Ranges");
+              const o = e.getResponseHeader("Content-Encoding");
+              var i = o && "identity" !== o;
+              if (!n) {
+                const t =
+                  "Warning: The server did not respond with Accept-Ranges=bytes. It either does not support byte serving or does not advertise it (`Accept-Ranges: bytes` header missing), or your database is hosted on CORS and the server doesn't mark the accept-ranges header as exposed. This may lead to incorrect results.";
+                console.warn(
+                  t,
+                  "(seen response headers:",
+                  e.getAllResponseHeaders(),
+                  ")"
+                );
+              }
+              if (
+                (i &&
+                  console.warn(
+                    `Warning: The server responded with ${o} encoding to a HEAD request. Ignoring since it may not do so for Range HTTP requests, but this will lead to incorrect results otherwise since the ranges will be based on the compressed data instead of the uncompressed data.`
+                  ),
+                i && (r = null),
+                !this._length)
+              ) {
+                if (!r)
+                  throw (
+                    (console.error(
+                      "response headers",
+                      e.getAllResponseHeaders()
+                    ),
+                    Error(
+                      "Length of the file not known. It must either be supplied in the config or given by the HTTP server."
+                    ))
+                  );
+                this._length = r;
+              }
+              this.serverChecked = !0;
+            }
+            get length() {
+              return this.serverChecked || this.checkServer(), this._length;
+            }
+            get chunkSize() {
+              return this.serverChecked || this.checkServer(), this._chunkSize;
+            }
+            doXHR(e, t) {
+              if (
+                (console.log(
+                  `[xhr of size ${(t + 1 - e) / 1024} KiB @ ${e / 1024} KiB]`
+                ),
+                (this.totalFetchedBytes += t - e),
+                this.totalRequests++,
+                e > t)
+              )
+                throw new Error(
+                  "invalid range (" + e + ", " + t + ") or no bytes requested!"
+                );
+              if (t > this.length - 1)
+                throw new Error(
+                  "only " + this.length + " bytes available! programmer error!"
+                );
+              const { fromByte: r, toByte: n, url: o } = this.rangeMapper(e, t);
+              var i = new XMLHttpRequest();
+              if (
+                (i.open("GET", o, !1),
+                this.length !== this.chunkSize &&
+                  i.setRequestHeader("Range", "bytes=" + r + "-" + n),
+                (i.responseType = "arraybuffer"),
+                i.overrideMimeType &&
+                  i.overrideMimeType("text/plain; charset=x-user-defined"),
+                i.send(null),
+                !((i.status >= 200 && i.status < 300) || 304 === i.status))
+              )
+                throw new Error("Couldn't load " + o + ". Status: " + i.status);
+              if (void 0 !== i.response) return i.response;
+              throw Error("xhr did not return uint8array");
+            }
+          }
           (t.LazyUint8Array = r),
-            (t.createLazyFile = function (e, t, n, o, i, a) {
-              var s = new r(a),
-                u = { isDevice: !1, contents: s },
+            (t.createLazyFile = function (e, t, n, o, i, s) {
+              var a = new r(s),
+                u = { isDevice: !1, contents: a },
                 l = e.createFile(t, n, u, o, i);
-              (l.contents = s),
+              (l.contents = a),
                 Object.defineProperties(l, {
                   usedBytes: {
                     get: function () {
@@ -648,7 +467,7 @@
               );
             });
         },
-        630: function _(__unused_webpack_module, exports, __webpack_require__) {
+        630: function (__unused_webpack_module, exports, __webpack_require__) {
           "use strict";
           var __createBinding =
               (this && this.__createBinding) ||
@@ -696,343 +515,136 @@
               };
           Object.defineProperty(exports, "__esModule", { value: !0 }),
             (exports.toObjects = void 0);
-          var Comlink = __importStar(__webpack_require__(870)),
+          const Comlink = __importStar(__webpack_require__(870)),
             sql_wasm_js_1 = __importDefault(__webpack_require__(365)),
             sql_wasm_wasm_1 = __importDefault(__webpack_require__(720)),
             lazyFile_1 = __webpack_require__(794),
             vtab_1 = __webpack_require__(457);
           function initTransferHandlers(e) {
             Comlink.transferHandlers.set("WORKERSQLPROXIES", {
-              canHandle: function (t) {
-                var r = t instanceof e.Database,
+              canHandle: (t) => {
+                let r = t instanceof e.Database,
                   n = t && t.db && t.db instanceof e.Database;
                 return r || n;
               },
-              serialize: function (e) {
-                var t = new MessageChannel(),
-                  r = t.port1,
-                  n = t.port2;
-                return Comlink.expose(e, r), [n, [n]];
+              serialize(e) {
+                const { port1: t, port2: r } = new MessageChannel();
+                return Comlink.expose(e, t), [r, [r]];
               },
-              deserialize: function (e) {},
+              deserialize: (e) => {},
             });
           }
-          function init(e) {
-            return _init.apply(this, arguments);
-          }
-          function _init() {
-            return (_init = _asyncToGenerator(
-              _regeneratorRuntime.mark(function e(t) {
-                var r;
-                return _regeneratorRuntime.wrap(function (e) {
-                  for (;;)
-                    switch ((e.prev = e.next)) {
-                      case 0:
-                        return (
-                          (e.next = 2),
-                          sql_wasm_js_1.default({
-                            locateFile: function (e) {
-                              return t;
-                            },
-                          })
-                        );
-                      case 2:
-                        return (
-                          (r = e.sent),
-                          e.abrupt("return", (initTransferHandlers(r), r))
-                        );
-                      case 4:
-                      case "end":
-                        return e.stop();
-                    }
-                }, e);
-              })
-            )).apply(this, arguments);
+          async function init(e) {
+            const t = await sql_wasm_js_1.default({ locateFile: (t) => e });
+            return initTransferHandlers(t), t;
           }
           function toObjects(e) {
-            return e.flatMap(function (e) {
-              return e.values.map(function (t) {
-                for (var r = {}, n = 0; n < e.columns.length; n++)
+            return e.flatMap((e) =>
+              e.values.map((t) => {
+                const r = {};
+                for (let n = 0; n < e.columns.length; n++)
                   r[e.columns[n]] = t[n];
                 return r;
-              });
-            });
-          }
-          function fetchConfigs(e) {
-            return _fetchConfigs.apply(this, arguments);
-          }
-          function _fetchConfigs() {
-            return (
-              (_fetchConfigs = _asyncToGenerator(
-                _regeneratorRuntime.mark(function e(t) {
-                  var r;
-                  return _regeneratorRuntime.wrap(function (e) {
-                    for (;;)
-                      switch ((e.prev = e.next)) {
-                        case 0:
-                          return (
-                            (r = t.map(
-                              (function () {
-                                var e = _asyncToGenerator(
-                                  _regeneratorRuntime.mark(function e(t) {
-                                    var r, n, o;
-                                    return _regeneratorRuntime.wrap(function (
-                                      e
-                                    ) {
-                                      for (;;)
-                                        switch ((e.prev = e.next)) {
-                                          case 0:
-                                            if ("jsonconfig" !== t.from) {
-                                              e.next = 16;
-                                              break;
-                                            }
-                                            return (
-                                              (r = new URL(
-                                                t.configUrl,
-                                                location.href
-                                              )),
-                                              (e.next = 4),
-                                              fetch(r.toString())
-                                            );
-                                          case 4:
-                                            if ((n = e.sent).ok) {
-                                              e.next = 12;
-                                              break;
-                                            }
-                                            return (
-                                              (e.t0 = console),
-                                              (e.next = 9),
-                                              n.text()
-                                            );
-                                          case 9:
-                                            throw (
-                                              ((e.t1 = e.sent),
-                                              e.t0.error.call(
-                                                e.t0,
-                                                "httpvfs config error",
-                                                e.t1
-                                              ),
-                                              Error(
-                                                "Could not load httpvfs config: "
-                                                  .concat(n.status, ": ")
-                                                  .concat(n.statusText)
-                                              ))
-                                            );
-                                          case 12:
-                                            return (e.next = 14), n.json();
-                                          case 14:
-                                            return (
-                                              (o = e.sent),
-                                              e.abrupt("return", {
-                                                from: "inline",
-                                                config:
-                                                  "chunked" === o.serverMode
-                                                    ? _objectSpread(
-                                                        _objectSpread({}, o),
-                                                        {},
-                                                        {
-                                                          urlPrefix: new URL(
-                                                            o.urlPrefix,
-                                                            r
-                                                          ).toString(),
-                                                        }
-                                                      )
-                                                    : _objectSpread(
-                                                        _objectSpread({}, o),
-                                                        {},
-                                                        {
-                                                          url: new URL(
-                                                            o.url,
-                                                            r
-                                                          ).toString(),
-                                                        }
-                                                      ),
-                                                virtualFilename:
-                                                  t.virtualFilename,
-                                              })
-                                            );
-                                          case 16:
-                                            return e.abrupt("return", t);
-                                          case 17:
-                                          case "end":
-                                            return e.stop();
-                                        }
-                                    },
-                                    e);
-                                  })
-                                );
-                                return function (t) {
-                                  return e.apply(this, arguments);
-                                };
-                              })()
-                            )),
-                            e.abrupt("return", Promise.all(r))
-                          );
-                        case 2:
-                        case "end":
-                          return e.stop();
-                      }
-                  }, e);
-                })
-              )),
-              _fetchConfigs.apply(this, arguments)
+              })
             );
           }
+          async function fetchConfigs(e) {
+            const t = e.map(async (e) => {
+              if ("jsonconfig" === e.from) {
+                const t = new URL(e.configUrl, location.href),
+                  r = await fetch(t.toString());
+                if (!r.ok)
+                  throw (
+                    (console.error("httpvfs config error", await r.text()),
+                    Error(
+                      `Could not load httpvfs config: ${r.status}: ${r.statusText}`
+                    ))
+                  );
+                const n = await r.json();
+                return {
+                  from: "inline",
+                  config:
+                    "chunked" === n.serverMode
+                      ? { ...n, urlPrefix: new URL(n.urlPrefix, t).toString() }
+                      : { ...n, url: new URL(n.url, t).toString() },
+                  virtualFilename: e.virtualFilename,
+                };
+              }
+              return e;
+            });
+            return Promise.all(t);
+          }
           sql_wasm_wasm_1.default, (exports.toObjects = toObjects);
-          var mod = {
+          const mod = {
             db: null,
             inited: !1,
             sqljs: null,
-            SplitFileHttpDatabase: function (e, t, r) {
-              var n = this;
-              return _asyncToGenerator(
-                _regeneratorRuntime.mark(function o() {
-                  var i, a, s, u, l, c, f, d;
-                  return _regeneratorRuntime.wrap(function (o) {
-                    for (;;)
-                      switch ((o.prev = o.next)) {
-                        case 0:
-                          if (!n.inited) {
-                            o.next = 2;
-                            break;
-                          }
-                          throw Error(
-                            "sorry, only one db is supported right now"
-                          );
-                        case 2:
-                          return (
-                            (n.inited = !0),
-                            n.sqljs || (n.sqljs = init(e)),
-                            (o.next = 5),
-                            n.sqljs
-                          );
-                        case 5:
-                          return (
-                            (i = o.sent),
-                            (a = new Map()),
-                            (o.next = 9),
-                            fetchConfigs(t)
-                          );
-                        case 9:
-                          (s = o.sent), (l = _createForOfIteratorHelper(s));
-                          try {
-                            for (
-                              f = function () {
-                                var e,
-                                  t = c.value,
-                                  n = t.config,
-                                  o = t.virtualFilename,
-                                  s =
-                                    "chunked" === n.serverMode
-                                      ? n.urlPrefix
-                                      : n.url;
-                                console.log("constructing url database", s),
-                                  (e =
-                                    "chunked" == n.serverMode
-                                      ? function (e, t) {
-                                          var r = (e / n.serverChunkSize) | 0,
-                                            o = e % n.serverChunkSize,
-                                            i = o + (t - e);
-                                          return {
-                                            url:
-                                              n.urlPrefix +
-                                              String(r).padStart(3, "0"),
-                                            fromByte: o,
-                                            toByte: i,
-                                          };
-                                        }
-                                      : function (e, t) {
-                                          return {
-                                            url: n.url,
-                                            fromByte: e,
-                                            toByte: t,
-                                          };
-                                        });
-                                var l = o || s.replace(/\//g, "_");
-                                r || ((r = l), (u = n)),
-                                  console.log("filename", l),
-                                  console.log(
-                                    "constructing url database",
-                                    s,
-                                    "filename",
-                                    l
-                                  );
-                                var f = lazyFile_1.createLazyFile(
-                                  i.FS,
-                                  "/",
-                                  l,
-                                  !0,
-                                  !0,
-                                  {
-                                    rangeMapper: e,
-                                    requestChunkSize: n.requestChunkSize,
-                                    fileLength:
-                                      "chunked" === n.serverMode
-                                        ? n.databaseLengthBytes
-                                        : void 0,
-                                    logPageReads: !0,
-                                    maxReadHeads: 3,
-                                  }
-                                );
-                                a.set(l, f);
-                              },
-                                l.s();
-                              !(c = l.n()).done;
-
-                            )
-                              f();
-                          } catch (h) {
-                            l.e(h);
-                          } finally {
-                            l.f();
-                          }
-                          if (((n.db = new i.CustomDatabase(r)), !u)) {
-                            o.next = 17;
-                            break;
-                          }
-                          return (
-                            (o.next = 15),
-                            n.db.exec("pragma page_size; pragma cache_size=0")
-                          );
-                        case 15:
-                          (d = o.sent[0].values[0][0]) !== u.requestChunkSize &&
-                            console.warn(
-                              "Chunk size does not match page size: pragma page_size = "
-                                .concat(d, " but chunkSize = ")
-                                .concat(u.requestChunkSize)
-                            );
-                        case 17:
-                          return o.abrupt(
-                            "return",
-                            ((n.db.lazyFiles = a),
-                            n.db.create_vtab(vtab_1.SeriesVtab),
-                            (n.db.query = function () {
-                              var e;
-                              return toObjects(
-                                (e = n.db).exec.apply(e, arguments)
-                              );
-                            }),
-                            n.db)
-                          );
-                        case 18:
-                        case "end":
-                          return o.stop();
-                      }
-                  }, o);
-                })
-              )();
+            async SplitFileHttpDatabase(e, t, r) {
+              if (this.inited)
+                throw Error("sorry, only one db is supported right now");
+              (this.inited = !0), this.sqljs || (this.sqljs = init(e));
+              const n = await this.sqljs,
+                o = new Map(),
+                i = await fetchConfigs(t);
+              let s;
+              for (const { config: e, virtualFilename: t } of i) {
+                const i = "chunked" === e.serverMode ? e.urlPrefix : e.url;
+                let a;
+                console.log("constructing url database", i),
+                  (a =
+                    "chunked" == e.serverMode
+                      ? (t, r) => {
+                          const n = (t / e.serverChunkSize) | 0,
+                            o = t % e.serverChunkSize,
+                            i = o + (r - t);
+                          return {
+                            url: e.urlPrefix + String(n).padStart(3, "0"),
+                            fromByte: o,
+                            toByte: i,
+                          };
+                        }
+                      : (t, r) => ({ url: e.url, fromByte: t, toByte: r }));
+                const u = t || i.replace(/\//g, "_");
+                r || ((r = u), (s = e)),
+                  console.log("filename", u),
+                  console.log("constructing url database", i, "filename", u);
+                const l = lazyFile_1.createLazyFile(n.FS, "/", u, !0, !0, {
+                  rangeMapper: a,
+                  requestChunkSize: e.requestChunkSize,
+                  fileLength:
+                    "chunked" === e.serverMode ? e.databaseLengthBytes : void 0,
+                  logPageReads: !0,
+                  maxReadHeads: 3,
+                });
+                o.set(u, l);
+              }
+              if (((this.db = new n.CustomDatabase(r)), s)) {
+                const e = (
+                  await this.db.exec("pragma page_size; pragma cache_size=0")
+                )[0].values[0][0];
+                e !== s.requestChunkSize &&
+                  console.warn(
+                    `Chunk size does not match page size: pragma page_size = ${e} but chunkSize = ${s.requestChunkSize}`
+                  );
+              }
+              return (
+                (this.db.lazyFiles = o),
+                this.db.create_vtab(vtab_1.SeriesVtab),
+                (this.db.query = (...e) => toObjects(this.db.exec(...e))),
+                this.db
+              );
             },
-            getResetAccessedPages: function (e) {
+            getResetAccessedPages(e) {
               if (!this.db) return [];
-              var t = this.db.lazyFiles.get(e || this.db.filename);
+              const t = this.db.lazyFiles.get(e || this.db.filename);
               if (!t) throw Error("unknown lazy file");
-              var r = _toConsumableArray(t.contents.readPages);
+              const r = [...t.contents.readPages];
               return (t.contents.readPages = []), r;
             },
-            getStats: function (e) {
-              var t = this.db;
+            getStats(e) {
+              const t = this.db;
               if (!t) return null;
-              var r = t.lazyFiles.get(e || t.filename);
+              const r = t.lazyFiles.get(e || t.filename);
               if (!r) throw Error("unknown lazy file");
               return {
                 filename: t.filename,
@@ -1041,40 +653,15 @@
                 totalRequests: r.contents.totalRequests,
               };
             },
-            evalCode: function evalCode(code) {
-              var _this2 = this;
-              return _asyncToGenerator(
-                _regeneratorRuntime.mark(function _callee2() {
-                  return _regeneratorRuntime.wrap(function _callee2$(
-                    _context2
-                  ) {
-                    for (;;)
-                      switch ((_context2.prev = _context2.next)) {
-                        case 0:
-                          return (
-                            (_context2.next = 2),
-                            eval(
-                              "(async function (db) {\n      ".concat(
-                                code,
-                                "\n    })"
-                              )
-                            )(_this2.db)
-                          );
-                        case 2:
-                          return _context2.abrupt("return", _context2.sent);
-                        case 3:
-                        case "end":
-                          return _context2.stop();
-                      }
-                  },
-                  _callee2);
-                })
-              )();
+            async evalCode(code) {
+              return await eval(
+                `(async function (db) {\n      ${code}\n    })`
+              )(this.db);
             },
           };
           Comlink.expose(mod);
         },
-        457: function (e, t) {
+        457: (e, t) => {
           "use strict";
           var r;
           Object.defineProperty(t, "__esModule", { value: !0 }),
@@ -1091,275 +678,203 @@
                 (e[(e.selector = 8)] = "selector"),
                 (e[(e.querySelector = 9)] = "querySelector");
             })(r || (r = {}));
-          var n = Object.keys(r)
-            .map(function (e) {
-              return r[e];
-            })
-            .filter(function (e) {
-              return "string" == typeof e;
-            });
+          const n = Object.keys(r)
+            .map((e) => r[e])
+            .filter((e) => "string" == typeof e);
           function o(e) {
-            for (var t = {}, n = 0; n < e.length; n++) t[r[n]] = e[n];
+            const t = {};
+            for (let n = 0; n < e.length; n++) t[r[n]] = e[n];
             return t;
           }
           function i(e) {
-            var t = new SharedArrayBuffer(1048576),
+            const t = new SharedArrayBuffer(1048576),
               r = new Int32Array(t, 0, 2);
             (r[0] = 1),
               self.postMessage({ action: "eval", notify: t, request: e }),
               Atomics.wait(r, 0, 1);
-            var n = r[1],
+            const n = r[1],
               o = new Uint8Array(t, 8, n).slice(),
               i = new TextDecoder().decode(o),
-              a = JSON.parse(i);
-            if ("err" in a) throw new Error(a.err);
-            return a.ok;
+              s = JSON.parse(i);
+            if ("err" in s) throw new Error(s.err);
+            return s.ok;
           }
-          t.SeriesVtab = (function () {
-            function e(t, r) {
-              _classCallCheck(this, e),
-                (this.module = t),
-                (this.db = r),
+          t.SeriesVtab = class {
+            constructor(e, t) {
+              (this.module = e),
+                (this.db = t),
                 (this.name = "dom"),
                 (this.iVersion = 2),
                 (this.cursors = new Map()),
                 console.log("constructed vfs");
             }
-            return (
-              _createClass(e, [
-                {
-                  key: "getCursor",
-                  value: function (e) {
-                    var t = this.cursors.get(e);
-                    if (!t) throw Error("impl error");
-                    return t;
-                  },
-                },
-                {
-                  key: "xConnect",
-                  value: function (e, t, r, o, i, a) {
-                    console.log("xconnect!!"),
-                      this.db.handleError(
-                        this.module.ccall(
-                          "sqlite3_declare_vtab",
-                          "number",
-                          ["number", "string"],
-                          [
-                            e,
-                            "create table x(\n              ".concat(
-                              n.slice(0, -1).join(", "),
-                              " PRIMARY KEY\n          ) WITHOUT ROWID"
-                            ),
-                          ]
-                        )
-                      );
-                    var s = this.module._malloc(12);
-                    return this.module.setValue(i, s, "*"), 0;
-                  },
-                },
-                {
-                  key: "xDisconnect",
-                  value: function (e) {
-                    return this.module._free(e), 0;
-                  },
-                },
-                {
-                  key: "xOpen",
-                  value: function (e, t) {
-                    var r = this.module._malloc(4);
-                    return (
-                      this.cursors.set(r, {
-                        elements: [],
-                        index: 0,
-                        querySelector: "",
-                      }),
-                      this.module.setValue(t, r, "*"),
-                      0
-                    );
-                  },
-                },
-                {
-                  key: "xClose",
-                  value: function (e) {
-                    return this.module._free(e), 0;
-                  },
-                },
-                {
-                  key: "xBestIndex",
-                  value: function (e, t) {
-                    try {
-                      for (
-                        var n = this.module.getValue(t + 0, "i32"),
-                          o = this.module.getValue(t + 4, "i32"),
-                          i = !1,
-                          a = 0;
-                        a < n;
-                        a++
-                      ) {
-                        var s = o + 12 * a,
-                          u = this.module.getValue(s, "i32"),
-                          l = this.module.getValue(s + 4, "i8");
-                        if (this.module.getValue(s + 5, "i8")) {
-                          if (64 === l) {
-                            if (u !== r.selector)
-                              throw Error(
-                                "The match operator can only be applied to the selector column!"
-                              );
-                            i = !0;
-                            var c = this.module.getValue(t + 16, "i32");
-                            this.module.setValue(c + 8 * a, 1, "i32");
-                          }
-                          console.log(
-                            "constraint "
-                              .concat(a, ": ")
-                              .concat(r[u], " (op=")
-                              .concat(l, ")")
-                          );
-                        }
-                      }
-                      if (!i)
+            getCursor(e) {
+              const t = this.cursors.get(e);
+              if (!t) throw Error("impl error");
+              return t;
+            }
+            xConnect(e, t, r, o, i, s) {
+              console.log("xconnect!!"),
+                this.db.handleError(
+                  this.module.ccall(
+                    "sqlite3_declare_vtab",
+                    "number",
+                    ["number", "string"],
+                    [
+                      e,
+                      `create table x(\n              ${n
+                        .slice(0, -1)
+                        .join(", ")} PRIMARY KEY\n          ) WITHOUT ROWID`,
+                    ]
+                  )
+                );
+              const a = this.module._malloc(12);
+              return this.module.setValue(i, a, "*"), 0;
+            }
+            xDisconnect(e) {
+              return this.module._free(e), 0;
+            }
+            xOpen(e, t) {
+              const r = this.module._malloc(4);
+              return (
+                this.cursors.set(r, {
+                  elements: [],
+                  index: 0,
+                  querySelector: "",
+                }),
+                this.module.setValue(t, r, "*"),
+                0
+              );
+            }
+            xClose(e) {
+              return this.module._free(e), 0;
+            }
+            xBestIndex(e, t) {
+              try {
+                const e = this.module.getValue(t + 0, "i32"),
+                  n = this.module.getValue(t + 4, "i32"),
+                  o = 64;
+                let i = !1;
+                for (let s = 0; s < e; s++) {
+                  const e = n + 12 * s,
+                    a = this.module.getValue(e, "i32"),
+                    u = this.module.getValue(e + 4, "i8");
+                  if (this.module.getValue(e + 5, "i8")) {
+                    if (u === o) {
+                      if (a !== r.selector)
                         throw Error(
-                          "You must query the dom using `select ... from dom where selector MATCH <css-selector>`"
+                          "The match operator can only be applied to the selector column!"
                         );
-                      var f = this.module.getValue(t + 64, "i32");
-                      return this.module.setValue(t + 20, f, "i32"), 0;
-                    } catch (t) {
-                      return (
-                        console.error("xbestindex", t),
-                        this.setVtabError(e, String(t)),
-                        21
-                      );
-                    }
-                  },
-                },
-                {
-                  key: "xFilter",
-                  value: function (e, t, o, a, s) {
-                    if ((console.log("xfilter", a), 1 !== a))
-                      return (
-                        console.error(
-                          "did not get a single argument to xFilter"
-                        ),
-                        21
-                      );
-                    var u = this.module.extract_value(s + 0),
-                      l = this.getCursor(e);
-                    l.querySelector = u;
-                    var c = t,
-                      f = n.filter(function (e) {
-                        return c & (1 << r[e]);
-                      });
-                    return (
-                      console.log("used columns", f),
-                      (l.elements = i({
-                        type: "select",
-                        selector: u,
-                        columns: f,
-                      })),
-                      0
-                    );
-                  },
-                },
-                {
-                  key: "xNext",
-                  value: function (e) {
-                    return this.getCursor(e).index++, 0;
-                  },
-                },
-                {
-                  key: "xEof",
-                  value: function (e) {
-                    var t = this.getCursor(e);
-                    return +(t.index >= t.elements.length);
-                  },
-                },
-                {
-                  key: "xColumn",
-                  value: function (e, t, n) {
-                    var o = this.getCursor(e),
-                      i = o.elements[o.index];
-                    if (r[n] in i) this.module.set_return_value(t, i[r[n]]);
-                    else
-                      switch (n) {
-                        case r.idx:
-                          this.module.set_return_value(t, o.index);
-                          break;
-                        case r.querySelector:
-                          this.module.set_return_value(t, o.querySelector);
-                          break;
-                        default:
-                          throw Error("unknown column ".concat(r[n]));
+                      {
+                        i = !0;
+                        const e = this.module.getValue(t + 16, "i32"),
+                          r = 8;
+                        this.module.setValue(e + s * r, 1, "i32");
                       }
-                    return 0;
-                  },
-                },
-                {
-                  key: "setVtabError",
-                  value: function (e, t) {
-                    var r = this.module.lengthBytesUTF8(t) + 1,
-                      n = this.module.sqlite3_malloc(r);
-                    console.log("writing error", t, r),
-                      this.module.stringToUTF8(t, n, r),
-                      this.module.setValue(e + 8, n, "i32");
-                  },
-                },
-                {
-                  key: "xUpdate",
-                  value: function (e, t, r, n) {
-                    var a = this;
-                    try {
-                      var s = Array.from({ length: t }, function (e, t) {
-                          return a.module.extract_value(r + 4 * t);
-                        }),
-                        u = _toArray(s),
-                        l = u[0],
-                        c = u[1],
-                        f = u.slice(2);
-                      if (l)
-                        if (l && !c)
-                          console.log("DELETE", l),
-                            i({ type: "delete", selector: l });
-                        else {
-                          if (l !== c) throw "The selector row can't be set";
-                          i({ type: "update", value: o(f) });
-                        }
-                      else
-                        console.assert(null === c),
-                          i({ type: "insert", value: o(f) });
-                      return 0;
-                    } catch (t) {
-                      return this.setVtabError(e, String(t)), 21;
                     }
-                  },
-                },
-                {
-                  key: "xRowid",
-                  value: function (e, t) {
-                    throw Error("xRowid not implemented");
-                  },
-                },
-                {
-                  key: "xFindFunction",
-                  value: function (e, t, r, n, o) {
-                    var i = this;
-                    return "match" !== this.module.UTF8ToString(r)
-                      ? 0
-                      : (this.module.setValue(
-                          n,
-                          this.module.addFunction(function (e, t, r) {
-                            i.module.set_return_value(e, !0);
-                          }, "viii"),
-                          "i32"
-                        ),
-                        150);
-                  },
-                },
-              ]),
-              e
-            );
-          })();
+                    console.log(`constraint ${s}: ${r[a]} (op=${u})`);
+                  }
+                }
+                if (!i)
+                  throw Error(
+                    "You must query the dom using `select ... from dom where selector MATCH <css-selector>`"
+                  );
+                const s = this.module.getValue(t + 64, "i32");
+                return this.module.setValue(t + 20, s, "i32"), 0;
+              } catch (t) {
+                return (
+                  console.error("xbestindex", t),
+                  this.setVtabError(e, String(t)),
+                  21
+                );
+              }
+            }
+            xFilter(e, t, o, s, a) {
+              if ((console.log("xfilter", s), 1 !== s))
+                return (
+                  console.error("did not get a single argument to xFilter"), 21
+                );
+              const u = this.module.extract_value(a + 0),
+                l = this.getCursor(e);
+              l.querySelector = u;
+              const c = t,
+                f = n.filter((e) => c & (1 << r[e]));
+              return (
+                console.log("used columns", f),
+                (l.elements = i({ type: "select", selector: u, columns: f })),
+                0
+              );
+            }
+            xNext(e) {
+              return this.getCursor(e).index++, 0;
+            }
+            xEof(e) {
+              const t = this.getCursor(e);
+              return +(t.index >= t.elements.length);
+            }
+            xColumn(e, t, n) {
+              const o = this.getCursor(e),
+                i = o.elements[o.index];
+              if (r[n] in i) this.module.set_return_value(t, i[r[n]]);
+              else
+                switch (n) {
+                  case r.idx:
+                    this.module.set_return_value(t, o.index);
+                    break;
+                  case r.querySelector:
+                    this.module.set_return_value(t, o.querySelector);
+                    break;
+                  default:
+                    throw Error(`unknown column ${r[n]}`);
+                }
+              return 0;
+            }
+            setVtabError(e, t) {
+              const r = this.module.lengthBytesUTF8(t) + 1,
+                n = this.module.sqlite3_malloc(r);
+              console.log("writing error", t, r),
+                this.module.stringToUTF8(t, n, r),
+                this.module.setValue(e + 8, n, "i32");
+            }
+            xUpdate(e, t, r, n) {
+              try {
+                const [e, n, ...s] = Array.from({ length: t }, (e, t) =>
+                  this.module.extract_value(r + 4 * t)
+                );
+                if (e)
+                  if (e && !n)
+                    console.log("DELETE", e),
+                      i({ type: "delete", selector: e });
+                  else {
+                    if (e !== n) throw "The selector row can't be set";
+                    i({ type: "update", value: o(s) });
+                  }
+                else
+                  console.assert(null === n),
+                    i({ type: "insert", value: o(s) });
+                return 0;
+              } catch (t) {
+                return this.setVtabError(e, String(t)), 21;
+              }
+            }
+            xRowid(e, t) {
+              throw Error("xRowid not implemented");
+            }
+            xFindFunction(e, t, r, n, o) {
+              return "match" !== this.module.UTF8ToString(r)
+                ? 0
+                : (this.module.setValue(
+                    n,
+                    this.module.addFunction((e, t, r) => {
+                      this.module.set_return_value(e, !0);
+                    }, "viii"),
+                    "i32"
+                  ),
+                  150);
+            }
+          };
         },
-        365: function (e, t, r) {
+        365: (e, t, r) => {
           e = r.nmd(e);
           var n = void 0,
             o = function (t) {
@@ -1367,9 +882,9 @@
                 n ||
                 (n = new Promise(function (n, o) {
                   var i,
-                    a = (i = void 0 !== t ? t : {}).onAbort;
+                    s = (i = void 0 !== t ? t : {}).onAbort;
                   (i.onAbort = function (e) {
-                    o(new Error(e)), a && a(e);
+                    o(new Error(e)), s && s(e);
                   }),
                     (i.postRun = i.postRun || []),
                     i.postRun.push(function () {
@@ -1378,7 +893,7 @@
                     (e = void 0),
                     ((i = void 0 !== i ? i : {}).onRuntimeInitialized =
                       function () {
-                        var e = He(4),
+                        var e = Ne(4),
                           t = i.cwrap,
                           r = t("sqlite3_open", "number", ["string", "number"]),
                           n =
@@ -1396,8 +911,8 @@
                             "number",
                             "number",
                           ]),
-                          a = t("sqlite3_changes", "number", ["number"]),
-                          s = t("sqlite3_prepare_v2", "number", [
+                          s = t("sqlite3_changes", "number", ["number"]),
+                          a = t("sqlite3_prepare_v2", "number", [
                             "number",
                             "string",
                             "number",
@@ -1442,8 +957,8 @@
                             "string",
                           ]),
                           _ = t("sqlite3_step", "number", ["number"]),
-                          v = t("sqlite3_errmsg", "string", ["number"]),
-                          g = t("sqlite3_column_count", "number", ["number"]),
+                          g = t("sqlite3_errmsg", "string", ["number"]),
+                          v = t("sqlite3_column_count", "number", ["number"]),
                           y = t("sqlite3_data_count", "number", ["number"]),
                           b = t("sqlite3_column_double", "number", [
                             "number",
@@ -1465,21 +980,21 @@
                             "number",
                             "number",
                           ]),
-                          x = t("sqlite3_column_name", "string", [
+                          D = t("sqlite3_column_name", "string", [
                             "number",
                             "number",
                           ]),
-                          A = t("sqlite3_reset", "number", ["number"]),
-                          M = t("sqlite3_clear_bindings", "number", ["number"]),
+                          M = t("sqlite3_reset", "number", ["number"]),
+                          A = t("sqlite3_clear_bindings", "number", ["number"]),
                           R = t("sqlite3_finalize", "number", ["number"]),
-                          j = t("sqlite3_create_module_v2", "number", [
+                          z = t("sqlite3_create_module_v2", "number", [
                             "number",
                             "string",
                             "number",
                             "number",
                             "number",
                           ]),
-                          T = t("sqlite3_create_function_v2", "number", [
+                          j = t("sqlite3_create_function_v2", "number", [
                             "number",
                             "string",
                             "number",
@@ -1492,27 +1007,27 @@
                           ]),
                           B = t("sqlite3_value_type", "number", ["number"]),
                           L = t("sqlite3_value_bytes", "number", ["number"]),
-                          H = t("sqlite3_value_text", "string", ["number"]),
-                          N = t("sqlite3_value_blob", "number", ["number"]),
-                          U = t("sqlite3_value_double", "number", ["number"]),
-                          I = t("sqlite3_result_double", "", [
+                          N = t("sqlite3_value_text", "string", ["number"]),
+                          H = t("sqlite3_value_blob", "number", ["number"]),
+                          I = t("sqlite3_value_double", "number", ["number"]),
+                          U = t("sqlite3_result_double", "", [
                             "number",
                             "number",
                           ]),
                           W = t("sqlite3_result_null", "", ["number"]),
-                          Y = t("sqlite3_result_text", "", [
+                          K = t("sqlite3_result_text", "", [
                             "number",
                             "string",
                             "number",
                             "number",
                           ]),
-                          Q = t("sqlite3_result_blob", "", [
+                          Y = t("sqlite3_result_blob", "", [
                             "number",
                             "number",
                             "number",
                             "number",
                           ]),
-                          $ = t("sqlite3_result_int", "", ["number", "number"]),
+                          Q = t("sqlite3_result_int", "", ["number", "number"]),
                           J = t("sqlite3_result_error", "", [
                             "number",
                             "string",
@@ -1531,12 +1046,12 @@
                         }
                         function re(e, t) {
                           this.db = t;
-                          var r = K(e) + 1;
-                          if (((this.sqlPtr = je(r)), null === this.sqlPtr))
+                          var r = $(e) + 1;
+                          if (((this.sqlPtr = ze(r)), null === this.sqlPtr))
                             throw new Error(
                               "Unable to allocate memory for the SQL string"
                             );
-                          X(e, this.sqlPtr, r),
+                          G(e, this.sqlPtr, r),
                             (this.nextSqlPtr = this.sqlPtr),
                             (this.nextSqlString = null),
                             (this.activeStatement = null);
@@ -1546,8 +1061,8 @@
                             "dbfile_" + ((4294967295 * Math.random()) >>> 0)),
                             null != t &&
                               Ee.createDataFile("/", this.filename, t, !0, !0);
-                          var n = r(this.filename, e);
-                          (this.db = F(e, "i32")),
+                          const n = r(this.filename, e);
+                          (this.db = P(e, "i32")),
                             this.handleError(n),
                             ee(this.db),
                             (this.statements = {}),
@@ -1555,8 +1070,8 @@
                         }
                         function oe(t) {
                           this.filename = t;
-                          var n = r(this.filename, e);
-                          (this.db = F(e, "i32")),
+                          const n = r(this.filename, e);
+                          (this.db = P(e, "i32")),
                             this.handleError(n),
                             ee(this.db),
                             (this.statements = {}),
@@ -1637,11 +1152,11 @@
                           }),
                           (te.prototype.getColumnNames = function () {
                             for (
-                              var e = [], t = g(this.stmt), r = 0;
+                              var e = [], t = v(this.stmt), r = 0;
                               r < t;
                               r += 1
                             )
-                              e.push(x(this.stmt, r));
+                              e.push(D(this.stmt, r));
                             return e;
                           }),
                           (te.prototype.getAsObject = function (e) {
@@ -1671,8 +1186,8 @@
                           }),
                           (te.prototype.bindString = function (e, t) {
                             null == t && ((t = this.pos), (this.pos += 1));
-                            var r = Fe(e),
-                              n = C(r, z);
+                            var r = Pe(e),
+                              n = C(r, T);
                             return (
                               this.allocatedmem.push(n),
                               this.db.handleError(
@@ -1683,7 +1198,7 @@
                           }),
                           (te.prototype.bindBlob = function (e, t) {
                             null == t && ((t = this.pos), (this.pos += 1));
-                            var r = C(e, z);
+                            var r = C(e, T);
                             return (
                               this.allocatedmem.push(r),
                               this.db.handleError(
@@ -1742,7 +1257,7 @@
                           (te.prototype.reset = function () {
                             return (
                               this.freemem(),
-                              0 === M(this.stmt) && 0 === A(this.stmt)
+                              0 === A(this.stmt) && 0 === M(this.stmt)
                             );
                           }),
                           (te.prototype.freemem = function () {
@@ -1751,7 +1266,7 @@
                               void 0 !== (e = this.allocatedmem.pop());
 
                             )
-                              ze(e);
+                              Te(e);
                           }),
                           (te.prototype.free = function () {
                             var e;
@@ -1775,14 +1290,14 @@
                                 (this.finalize(), new Error("Database closed"))
                               );
                             var t = Be(),
-                              r = He(4);
-                            P(e, 0, "i32"), P(r, 0, "i32");
+                              r = Ne(4);
+                            F(e, 0, "i32"), F(r, 0, "i32");
                             try {
                               this.db.handleError(
                                 c(this.db.db, this.nextSqlPtr, -1, e, r)
                               ),
-                                (this.nextSqlPtr = F(r, "i32"));
-                              var n = F(e, "i32");
+                                (this.nextSqlPtr = P(r, "i32"));
+                              var n = P(e, "i32");
                               return 0 === n
                                 ? (this.finalize(), { done: !0 })
                                 : ((this.activeStatement = new te(n, this.db)),
@@ -1800,7 +1315,7 @@
                             }
                           }),
                           (re.prototype.finalize = function () {
-                            ze(this.sqlPtr), (this.sqlPtr = null);
+                            Te(this.sqlPtr), (this.sqlPtr = null);
                           }),
                           (re.prototype.getRemainingSQL = function () {
                             return null !== this.nextSqlString
@@ -1829,46 +1344,46 @@
                             var n,
                               o,
                               i,
-                              a = Be(),
-                              s = null;
+                              s = Be(),
+                              a = null;
                             try {
                               for (
                                 var u =
-                                    ((o = K((n = t)) + 1),
-                                    (i = He(o)),
-                                    G(n, O, i, o),
+                                    ((o = $((n = t)) + 1),
+                                    (i = Ne(o)),
+                                    X(n, O, i, o),
                                     i),
-                                  l = He(4),
+                                  l = Ne(4),
                                   f = [];
-                                0 !== F(u, "i8");
+                                0 !== P(u, "i8");
 
                               ) {
-                                P(e, 0, "i32"),
-                                  P(l, 0, "i32"),
+                                F(e, 0, "i32"),
+                                  F(l, 0, "i32"),
                                   this.handleError(c(this.db, u, -1, e, l));
-                                var d = F(e, "i32");
-                                if (((u = F(l, "i32")), 0 !== d)) {
+                                var d = P(e, "i32");
+                                if (((u = P(l, "i32")), 0 !== d)) {
                                   var h = null;
                                   for (
-                                    s = new te(d, this), null != r && s.bind(r);
-                                    s.step();
+                                    a = new te(d, this), null != r && a.bind(r);
+                                    a.step();
 
                                   )
                                     null === h &&
                                       ((h = {
-                                        columns: s.getColumnNames(),
+                                        columns: a.getColumnNames(),
                                         values: [],
                                       }),
                                       f.push(h)),
-                                      h.values.push(s.get());
-                                  s.free();
+                                      h.values.push(a.get());
+                                  a.free();
                                 }
                               }
                               return f;
                             } catch (e) {
-                              throw (s && s.free(), e);
+                              throw (a && a.free(), e);
                             } finally {
-                              Le(a);
+                              Le(s);
                             }
                           }),
                           (ne.prototype.each = function (e, t, r, n) {
@@ -1884,9 +1399,9 @@
                             if ("function" == typeof n) return n();
                           }),
                           (ne.prototype.prepare = function (t, r) {
-                            P(e, 0, "i32"),
-                              this.handleError(s(this.db, t, -1, e, 0));
-                            var n = F(e, "i32");
+                            F(e, 0, "i32"),
+                              this.handleError(a(this.db, t, -1, e, 0));
+                            var n = P(e, "i32");
                             if (0 === n) throw "Nothing to prepare";
                             var o = new te(n, this);
                             return (
@@ -1912,7 +1427,7 @@
                             });
                             return (
                               this.handleError(r(this.filename, e)),
-                              (this.db = F(e, "i32")),
+                              (this.db = P(e, "i32")),
                               t
                             );
                           }),
@@ -1933,12 +1448,12 @@
                             var t;
                             if (0 === e) return null;
                             throw (
-                              ((t = v(this.db)),
+                              ((t = g(this.db)),
                               new Error("SQLite: " + (t || "Code " + e)))
                             );
                           }),
                           (ne.prototype.getRowsModified = function () {
-                            return a(this.db);
+                            return s(this.db);
                           }),
                           (ne.prototype.create_function = function (e, t) {
                             Object.prototype.hasOwnProperty.call(
@@ -1946,11 +1461,11 @@
                               e
                             ) &&
                               (q(this.functions[e]), delete this.functions[e]);
-                            var r = D(function (e, r, n) {
-                              for (var o, a = [], s = 0; s < r; s += 1)
-                                a.push(i.extract_value(n + 4 * s));
+                            var r = x(function (e, r, n) {
+                              for (var o, s = [], a = 0; a < r; a += 1)
+                                s.push(i.extract_value(n + 4 * a));
                               try {
-                                o = t.apply(null, a);
+                                o = t.apply(null, s);
                               } catch (t) {
                                 return void J(e, "JS threw: " + t, -1);
                               }
@@ -1959,23 +1474,23 @@
                             return (
                               (this.functions[e] = r),
                               this.handleError(
-                                T(this.db, e, t.length, 1, 0, r, 0, 0, 0)
+                                j(this.db, e, t.length, 1, 0, r, 0, 0, 0)
                               ),
                               this
                             );
                           }),
                           (i.extract_value = function (e) {
-                            var t = F(e, "i32"),
+                            var t = P(e, "i32"),
                               r = B(t);
                             return 1 === r || 2 === r
-                              ? U(t)
+                              ? I(t)
                               : 3 === r
-                              ? H(t)
+                              ? N(t)
                               : 4 === r
                               ? (function (e) {
                                   for (
                                     var t = L(e),
-                                      r = N(e),
+                                      r = H(e),
                                       n = new Uint8Array(t),
                                       o = 0;
                                     o < t;
@@ -1989,19 +1504,19 @@
                           (i.set_return_value = function (e, t) {
                             switch (typeof t) {
                               case "boolean":
-                                $(e, t ? 1 : 0);
+                                Q(e, t ? 1 : 0);
                                 break;
                               case "number":
-                                I(e, t);
+                                U(e, t);
                                 break;
                               case "string":
-                                Y(e, t, -1, -1);
+                                K(e, t, -1, -1);
                                 break;
                               case "object":
                                 if (null === t) W(e);
                                 else if (null != t.length) {
-                                  var r = C(t, z);
-                                  Q(e, r, t.length, -1), ze(r);
+                                  var r = C(t, T);
+                                  Y(e, r, t.length, -1), Te(r);
                                 } else
                                   J(
                                     e,
@@ -2021,7 +1536,7 @@
                             }
                           }),
                           (ne.prototype.create_vtab = function (e) {
-                            var t = new e(i, this),
+                            const t = new e(i, this),
                               r = {
                                 iVersion: null,
                                 xCreate: "ptr",
@@ -2048,33 +1563,33 @@
                                 xRollbackTo: "ptr",
                                 xShadowName: "ptr",
                               },
-                              n = je(4 * Object.keys(r).length),
-                              o = 0;
-                            for (var a in r) {
-                              var s = t[a] || 0,
-                                u = "i32";
-                              if (r[a] && t[a]) {
-                                var l = t[a].bind(t);
-                                (s = D(
-                                  l,
-                                  Array(1 + l.length)
+                              n = ze(4 * Object.keys(r).length);
+                            let o = 0;
+                            for (const e in r) {
+                              let i = t[e] || 0,
+                                s = "i32";
+                              if (r[e] && t[e]) {
+                                const r = t[e].bind(t);
+                                (i = x(
+                                  r,
+                                  Array(1 + r.length)
                                     .fill("i")
                                     .join("")
                                 )),
-                                  (u = "*");
+                                  (s = "*");
                               }
-                              P(n + 4 * o, s, u), o++;
+                              F(n + 4 * o, i, s), o++;
                             }
-                            this.handleError(j(this.db, t.name, n, 0, 0));
+                            this.handleError(z(this.db, t.name, n, 0, 0));
                           }),
                           (i.Database = ne),
                           (i.CustomDatabase = oe),
                           (i.FS = Ee),
                           (oe.prototype = Object.create(ne.prototype));
                       });
-                  var s,
+                  var a,
                     u = {};
-                  for (s in i) i.hasOwnProperty(s) && (u[s] = i[s]);
+                  for (a in i) i.hasOwnProperty(a) && (u[a] = i[a]);
                   var l,
                     c,
                     f,
@@ -2083,14 +1598,14 @@
                     p = [],
                     m = "./this.program",
                     _ = "object" == typeof window,
-                    v = "function" == typeof importScripts,
-                    g =
+                    g = "function" == typeof importScripts,
+                    v =
                       "object" == typeof process &&
                       "object" == typeof process.versions &&
                       "string" == typeof process.versions.node,
                     y = "";
-                  g
-                    ? ((y = v ? r(101).dirname(y) + "/" : "//"),
+                  v
+                    ? ((y = g ? r(101).dirname(y) + "/" : "//"),
                       (l = function (e, t) {
                         return (
                           d || (d = r(905)),
@@ -2102,7 +1617,7 @@
                       (f = function (e) {
                         var t = l(e, !0);
                         return (
-                          t.buffer || (t = new Uint8Array(t)), M(t.buffer), t
+                          t.buffer || (t = new Uint8Array(t)), A(t.buffer), t
                         );
                       }),
                       (c = function (e, t, n) {
@@ -2120,8 +1635,8 @@
                       (i.inspect = function () {
                         return "[Emscripten Module object]";
                       }))
-                    : (_ || v) &&
-                      (v
+                    : (_ || g) &&
+                      (g
                         ? (y = self.location.href)
                         : "undefined" != typeof document &&
                           document.currentScript &&
@@ -2136,7 +1651,7 @@
                           t.open("GET", e, !1), t.send(null), t.responseText
                         );
                       }),
-                      v &&
+                      g &&
                         (f = function (e) {
                           var t = new XMLHttpRequest();
                           return (
@@ -2160,40 +1675,39 @@
                       }));
                   var b = i.print || console.log.bind(console),
                     w = i.printErr || console.warn.bind(console);
-                  for (s in u) u.hasOwnProperty(s) && (i[s] = u[s]);
+                  for (a in u) u.hasOwnProperty(a) && (i[a] = u[a]);
                   (u = null),
                     i.arguments && (p = i.arguments),
                     i.thisProgram && (m = i.thisProgram),
                     i.quit && i.quit;
                   var E,
                     k,
-                    S,
-                    x = [];
+                    S = [];
                   function q(e) {
-                    E.delete($.get(e)), x.push(e);
+                    E.delete(Q.get(e)), S.push(e);
                   }
-                  function D(e, t) {
+                  function x(e, t) {
                     return (function (e, t) {
                       if (!E) {
                         E = new WeakMap();
-                        for (var r = 0; r < $.length; r++) {
-                          var n = $.get(r);
+                        for (var r = 0; r < Q.length; r++) {
+                          var n = Q.get(r);
                           n && E.set(n, r);
                         }
                       }
                       if (E.has(e)) return E.get(e);
                       var o = (function () {
-                        if (x.length) return x.pop();
+                        if (S.length) return S.pop();
                         try {
-                          $.grow(1);
+                          Q.grow(1);
                         } catch (e) {
                           if (!(e instanceof RangeError)) throw e;
                           throw "Unable to grow wasm table. Set ALLOW_TABLE_GROWTH.";
                         }
-                        return $.length - 1;
+                        return Q.length - 1;
                       })();
                       try {
-                        $.set(o, e);
+                        Q.set(o, e);
                       } catch (r) {
                         if (!(r instanceof TypeError)) throw r;
                         var i = (function (e, t) {
@@ -2217,12 +1731,12 @@
                             return new WebAssembly.Function(n, e);
                           }
                           var i = [1, 0, 1, 96],
-                            a = t.slice(0, 1),
-                            s = t.slice(1),
+                            s = t.slice(0, 1),
+                            a = t.slice(1),
                             u = { i: 127, j: 126, f: 125, d: 124 };
-                          for (i.push(s.length), o = 0; o < s.length; ++o)
-                            i.push(u[s[o]]);
-                          "v" == a ? i.push(0) : (i = i.concat([1, u[a]])),
+                          for (i.push(a.length), o = 0; o < a.length; ++o)
+                            i.push(u[a[o]]);
+                          "v" == s ? i.push(0) : (i = i.concat([1, u[s]])),
                             (i[1] = i.length - 2);
                           var l = new Uint8Array(
                               [0, 97, 115, 109, 1, 0, 0, 0].concat(
@@ -2237,12 +1751,15 @@
                           return new WebAssembly.Instance(c, { e: { f: e } })
                             .exports.f;
                         })(e, t);
-                        $.set(o, i);
+                        Q.set(o, i);
                       }
                       return E.set(e, o), o;
                     })(e, t);
                   }
-                  function P(e, t, r, n) {
+                  i.wasmBinary && (k = i.wasmBinary);
+                  var D;
+                  i.noExitRuntime;
+                  function F(e, t, r, n) {
                     switch (
                       ("*" === (r = r || "i8").charAt(r.length - 1) &&
                         (r = "i32"),
@@ -2256,7 +1773,7 @@
                         L[e >> 1] = t;
                         break;
                       case "i32":
-                        H[e >> 2] = t;
+                        N[e >> 2] = t;
                         break;
                       case "i64":
                         (te = [
@@ -2275,20 +1792,20 @@
                                 ) >>> 0
                             : 0),
                         ]),
-                          (H[e >> 2] = te[0]),
-                          (H[(e + 4) >> 2] = te[1]);
+                          (N[e >> 2] = te[0]),
+                          (N[(e + 4) >> 2] = te[1]);
                         break;
                       case "float":
-                        N[e >> 2] = t;
+                        H[e >> 2] = t;
                         break;
                       case "double":
-                        U[e >> 3] = t;
+                        I[e >> 3] = t;
                         break;
                       default:
                         ce("invalid type for setValue: " + r);
                     }
                   }
-                  function F(e, t, r) {
+                  function P(e, t, r) {
                     switch (
                       ("*" === (t = t || "i8").charAt(t.length - 1) &&
                         (t = "i32"),
@@ -2301,28 +1818,26 @@
                         return L[e >> 1];
                       case "i32":
                       case "i64":
-                        return H[e >> 2];
-                      case "float":
                         return N[e >> 2];
+                      case "float":
+                        return H[e >> 2];
                       case "double":
-                        return U[e >> 3];
+                        return I[e >> 3];
                       default:
                         ce("invalid type for getValue: " + t);
                     }
                     return null;
                   }
-                  i.wasmBinary && (k = i.wasmBinary),
-                    i.noExitRuntime,
-                    "object" != typeof WebAssembly &&
-                      ce("no native wasm support detected");
-                  var A = !1;
-                  function M(e, t) {
+                  "object" != typeof WebAssembly &&
+                    ce("no native wasm support detected");
+                  var M = !1;
+                  function A(e, t) {
                     e || ce("Assertion failed: " + t);
                   }
                   function R(e) {
                     var t = i["_" + e];
                     return (
-                      M(
+                      A(
                         t,
                         "Cannot call unknown function " +
                           e +
@@ -2331,18 +1846,18 @@
                       t
                     );
                   }
-                  function j(e, t, r, n, o) {
+                  function z(e, t, r, n, o) {
                     var i = {
                         string: function (e) {
                           var t = 0;
                           if (null != e && 0 !== e) {
                             var r = 1 + (e.length << 2);
-                            X(e, (t = He(r)), r);
+                            G(e, (t = Ne(r)), r);
                           }
                           return t;
                         },
                         array: function (e) {
-                          var t = He(e.length);
+                          var t = Ne(e.length);
                           return (
                             (function (e, t) {
                               O.set(e, t);
@@ -2351,16 +1866,17 @@
                           );
                         },
                       },
-                      a = R(e),
-                      s = [],
+                      s = R(e),
+                      a = [],
                       u = 0;
                     if (n)
                       for (var l = 0; l < n.length; l++) {
                         var c = i[r[l]];
                         c
-                          ? (0 === u && (u = Be()), (s[l] = c(n[l])))
-                          : (s[l] = n[l]);
+                          ? (0 === u && (u = Be()), (a[l] = c(n[l])))
+                          : (a[l] = n[l]);
                       }
+                    var f = s.apply(null, a);
                     return (function (e) {
                       return (
                         0 !== u && Le(u),
@@ -2372,101 +1888,101 @@
                             : e;
                         })(e)
                       );
-                    })(a.apply(null, s));
+                    })(f);
                   }
-                  var z = 0;
+                  var T = 0;
                   function C(e, t) {
                     var r;
                     return (
-                      (r = 1 == t ? He(e.length) : je(e.length)),
+                      (r = 1 == t ? Ne(e.length) : ze(e.length)),
                       e.subarray || e.slice
                         ? B.set(e, r)
                         : B.set(new Uint8Array(e), r),
                       r
                     );
                   }
-                  var T,
+                  var j,
                     O,
                     B,
                     L,
-                    H,
                     N,
-                    U,
-                    I =
+                    H,
+                    I,
+                    U =
                       "undefined" != typeof TextDecoder
                         ? new TextDecoder("utf8")
                         : void 0;
                   function W(e, t, r) {
                     for (var n = t + r, o = t; e[o] && !(o >= n); ) ++o;
-                    if (o - t > 16 && e.subarray && I)
-                      return I.decode(e.subarray(t, o));
+                    if (o - t > 16 && e.subarray && U)
+                      return U.decode(e.subarray(t, o));
                     for (var i = ""; t < o; ) {
-                      var a = e[t++];
-                      if (128 & a) {
-                        var s = 63 & e[t++];
-                        if (192 != (224 & a)) {
+                      var s = e[t++];
+                      if (128 & s) {
+                        var a = 63 & e[t++];
+                        if (192 != (224 & s)) {
                           var u = 63 & e[t++];
                           if (
-                            (a =
-                              224 == (240 & a)
-                                ? ((15 & a) << 12) | (s << 6) | u
-                                : ((7 & a) << 18) |
-                                  (s << 12) |
+                            (s =
+                              224 == (240 & s)
+                                ? ((15 & s) << 12) | (a << 6) | u
+                                : ((7 & s) << 18) |
+                                  (a << 12) |
                                   (u << 6) |
                                   (63 & e[t++])) < 65536
                           )
-                            i += String.fromCharCode(a);
+                            i += String.fromCharCode(s);
                           else {
-                            var l = a - 65536;
+                            var l = s - 65536;
                             i += String.fromCharCode(
                               55296 | (l >> 10),
                               56320 | (1023 & l)
                             );
                           }
-                        } else i += String.fromCharCode(((31 & a) << 6) | s);
-                      } else i += String.fromCharCode(a);
+                        } else i += String.fromCharCode(((31 & s) << 6) | a);
+                      } else i += String.fromCharCode(s);
                     }
                     return i;
                   }
                   function V(e, t) {
                     return e ? W(B, e, t) : "";
                   }
-                  function G(e, t, r, n) {
+                  function X(e, t, r, n) {
                     if (!(n > 0)) return 0;
-                    for (var o = r, i = r + n - 1, a = 0; a < e.length; ++a) {
-                      var s = e.charCodeAt(a);
+                    for (var o = r, i = r + n - 1, s = 0; s < e.length; ++s) {
+                      var a = e.charCodeAt(s);
                       if (
-                        (s >= 55296 &&
-                          s <= 57343 &&
-                          (s =
-                            (65536 + ((1023 & s) << 10)) |
-                            (1023 & e.charCodeAt(++a))),
-                        s <= 127)
+                        (a >= 55296 &&
+                          a <= 57343 &&
+                          (a =
+                            (65536 + ((1023 & a) << 10)) |
+                            (1023 & e.charCodeAt(++s))),
+                        a <= 127)
                       ) {
                         if (r >= i) break;
-                        t[r++] = s;
-                      } else if (s <= 2047) {
+                        t[r++] = a;
+                      } else if (a <= 2047) {
                         if (r + 1 >= i) break;
-                        (t[r++] = 192 | (s >> 6)), (t[r++] = 128 | (63 & s));
-                      } else if (s <= 65535) {
+                        (t[r++] = 192 | (a >> 6)), (t[r++] = 128 | (63 & a));
+                      } else if (a <= 65535) {
                         if (r + 2 >= i) break;
-                        (t[r++] = 224 | (s >> 12)),
-                          (t[r++] = 128 | ((s >> 6) & 63)),
-                          (t[r++] = 128 | (63 & s));
+                        (t[r++] = 224 | (a >> 12)),
+                          (t[r++] = 128 | ((a >> 6) & 63)),
+                          (t[r++] = 128 | (63 & a));
                       } else {
                         if (r + 3 >= i) break;
-                        (t[r++] = 240 | (s >> 18)),
-                          (t[r++] = 128 | ((s >> 12) & 63)),
-                          (t[r++] = 128 | ((s >> 6) & 63)),
-                          (t[r++] = 128 | (63 & s));
+                        (t[r++] = 240 | (a >> 18)),
+                          (t[r++] = 128 | ((a >> 12) & 63)),
+                          (t[r++] = 128 | ((a >> 6) & 63)),
+                          (t[r++] = 128 | (63 & a));
                       }
                     }
                     return (t[r] = 0), r - o;
                   }
-                  function X(e, t, r) {
-                    return G(e, B, t, r);
+                  function G(e, t, r) {
+                    return X(e, B, t, r);
                   }
-                  function K(e) {
+                  function $(e) {
                     for (var t = 0, r = 0; r < e.length; ++r) {
                       var n = e.charCodeAt(r);
                       n >= 55296 &&
@@ -2480,24 +1996,24 @@
                     }
                     return t;
                   }
-                  function Y(e) {
-                    var t = K(e) + 1,
-                      r = je(t);
-                    return r && G(e, O, r, t), r;
+                  function K(e) {
+                    var t = $(e) + 1,
+                      r = ze(t);
+                    return r && X(e, O, r, t), r;
                   }
-                  function Q(e) {
-                    (T = e),
+                  function Y(e) {
+                    (j = e),
                       (i.HEAP8 = O = new Int8Array(e)),
                       (i.HEAP16 = L = new Int16Array(e)),
-                      (i.HEAP32 = H = new Int32Array(e)),
+                      (i.HEAP32 = N = new Int32Array(e)),
                       (i.HEAPU8 = B = new Uint8Array(e)),
                       (i.HEAPU16 = new Uint16Array(e)),
                       (i.HEAPU32 = new Uint32Array(e)),
-                      (i.HEAPF32 = N = new Float32Array(e)),
-                      (i.HEAPF64 = U = new Float64Array(e));
+                      (i.HEAPF32 = H = new Float32Array(e)),
+                      (i.HEAPF64 = I = new Float64Array(e));
                   }
                   i.INITIAL_MEMORY;
-                  var $,
+                  var Q,
                     J,
                     Z,
                     ee,
@@ -2506,8 +2022,8 @@
                     ne = [],
                     oe = [],
                     ie = 0,
-                    ae = null,
-                    se = null;
+                    se = null,
+                    ae = null;
                   function ue(e) {
                     ie++,
                       i.monitorRunDependencies && i.monitorRunDependencies(ie);
@@ -2517,17 +2033,17 @@
                       (ie--,
                       i.monitorRunDependencies && i.monitorRunDependencies(ie),
                       0 == ie &&
-                        (null !== ae && (clearInterval(ae), (ae = null)), se))
+                        (null !== se && (clearInterval(se), (se = null)), ae))
                     ) {
-                      var t = se;
-                      (se = null), t();
+                      var t = ae;
+                      (ae = null), t();
                     }
                   }
                   function ce(e) {
                     throw (
                       (i.onAbort && i.onAbort(e),
                       w((e += "")),
-                      (A = !0),
+                      (M = !0),
                       (e =
                         "abort(" +
                         e +
@@ -2559,8 +2075,8 @@
                         var r = t.func;
                         "number" == typeof r
                           ? void 0 === t.arg
-                            ? $.get(r)()
-                            : $.get(r)(t.arg)
+                            ? Q.get(r)()
+                            : Q.get(r)(t.arg)
                           : r(void 0 === t.arg ? null : t.arg);
                       } else t(i);
                     }
@@ -2575,19 +2091,19 @@
                           n = t.getTimezoneOffset(),
                           o = r.getTimezoneOffset(),
                           i = Math.max(n, o);
-                        function a(e) {
+                        function s(e) {
                           var t = e.toTimeString().match(/\(([A-Za-z ]+)\)$/);
                           return t ? t[1] : "GMT";
                         }
-                        (H[Oe() >> 2] = 60 * i),
-                          (H[Te() >> 2] = Number(n != o));
-                        var s = a(t),
-                          u = a(r),
-                          l = Y(s),
-                          c = Y(u);
+                        (N[Oe() >> 2] = 60 * i),
+                          (N[je() >> 2] = Number(n != o));
+                        var a = s(t),
+                          u = s(r),
+                          l = K(a),
+                          c = K(u);
                         o < n
-                          ? ((H[Ce() >> 2] = l), (H[(Ce() + 4) >> 2] = c))
-                          : ((H[Ce() >> 2] = c), (H[(Ce() + 4) >> 2] = l));
+                          ? ((N[Ce() >> 2] = l), (N[(Ce() + 4) >> 2] = c))
+                          : ((N[Ce() >> 2] = c), (N[(Ce() + 4) >> 2] = l));
                       })());
                   }
                   (i.preloadedImages = {}),
@@ -2658,7 +2174,7 @@
                         return _e.normalize(e + "/" + t);
                       },
                     },
-                    ve = {
+                    ge = {
                       resolve: function () {
                         for (
                           var e = "", t = !1, r = arguments.length - 1;
@@ -2695,37 +2211,37 @@
                           );
                           return t > r ? [] : e.slice(t, r - t + 1);
                         }
-                        (e = ve.resolve(e).substr(1)),
-                          (t = ve.resolve(t).substr(1));
+                        (e = ge.resolve(e).substr(1)),
+                          (t = ge.resolve(t).substr(1));
                         for (
                           var n = r(e.split("/")),
                             o = r(t.split("/")),
                             i = Math.min(n.length, o.length),
-                            a = i,
-                            s = 0;
-                          s < i;
-                          s++
+                            s = i,
+                            a = 0;
+                          a < i;
+                          a++
                         )
-                          if (n[s] !== o[s]) {
-                            a = s;
+                          if (n[a] !== o[a]) {
+                            s = a;
                             break;
                           }
                         var u = [];
-                        for (s = a; s < n.length; s++) u.push("..");
-                        return (u = u.concat(o.slice(a))).join("/");
+                        for (a = s; a < n.length; a++) u.push("..");
+                        return (u = u.concat(o.slice(s))).join("/");
                       },
                     },
-                    ge = {
+                    ve = {
                       ttys: [],
                       init: function () {},
                       shutdown: function () {},
                       register: function (e, t) {
-                        (ge.ttys[e] = { input: [], output: [], ops: t }),
-                          Ee.registerDevice(e, ge.stream_ops);
+                        (ve.ttys[e] = { input: [], output: [], ops: t }),
+                          Ee.registerDevice(e, ve.stream_ops);
                       },
                       stream_ops: {
                         open: function (e) {
-                          var t = ge.ttys[e.node.rdev];
+                          var t = ve.ttys[e.node.rdev];
                           if (!t) throw new Ee.ErrnoError(43);
                           (e.tty = t), (e.seekable = !1);
                         },
@@ -2738,17 +2254,17 @@
                         read: function (e, t, r, n, o) {
                           if (!e.tty || !e.tty.ops.get_char)
                             throw new Ee.ErrnoError(60);
-                          for (var i = 0, a = 0; a < n; a++) {
-                            var s;
+                          for (var i = 0, s = 0; s < n; s++) {
+                            var a;
                             try {
-                              s = e.tty.ops.get_char(e.tty);
+                              a = e.tty.ops.get_char(e.tty);
                             } catch (e) {
                               throw new Ee.ErrnoError(29);
                             }
-                            if (void 0 === s && 0 === i)
+                            if (void 0 === a && 0 === i)
                               throw new Ee.ErrnoError(6);
-                            if (null == s) break;
-                            i++, (t[r + a] = s);
+                            if (null == a) break;
+                            i++, (t[r + s] = a);
                           }
                           return i && (e.node.timestamp = Date.now()), i;
                         },
@@ -2768,7 +2284,7 @@
                         get_char: function (e) {
                           if (!e.input.length) {
                             var t = null;
-                            if (g) {
+                            if (v) {
                               var r = Buffer.alloc(256),
                                 n = 0;
                               try {
@@ -2794,7 +2310,7 @@
                                   null !== (t = readline()) &&
                                   (t += "\n");
                             if (!t) return null;
-                            e.input = Fe(t, !0);
+                            e.input = Pe(t, !0);
                           }
                           return e.input.shift();
                         },
@@ -2826,7 +2342,7 @@
                     e = (function (e, t) {
                       return 65536 * Math.ceil(e / 65536);
                     })(e);
-                    var t = Ne(65536, e);
+                    var t = He(65536, e);
                     return t
                       ? ((function (e, t) {
                           B.fill(0, e, e + t);
@@ -3029,44 +2545,44 @@
                         read: function (e, t, r, n, o) {
                           var i = e.node.contents;
                           if (o >= e.node.usedBytes) return 0;
-                          var a = Math.min(e.node.usedBytes - o, n);
-                          if (a > 8 && i.subarray)
-                            t.set(i.subarray(o, o + a), r);
-                          else for (var s = 0; s < a; s++) t[r + s] = i[o + s];
-                          return a;
+                          var s = Math.min(e.node.usedBytes - o, n);
+                          if (s > 8 && i.subarray)
+                            t.set(i.subarray(o, o + s), r);
+                          else for (var a = 0; a < s; a++) t[r + a] = i[o + a];
+                          return s;
                         },
                         write: function (e, t, r, n, o, i) {
                           if ((t.buffer === O.buffer && (i = !1), !n)) return 0;
-                          var a = e.node;
+                          var s = e.node;
                           if (
-                            ((a.timestamp = Date.now()),
-                            t.subarray && (!a.contents || a.contents.subarray))
+                            ((s.timestamp = Date.now()),
+                            t.subarray && (!s.contents || s.contents.subarray))
                           ) {
                             if (i)
                               return (
-                                (a.contents = t.subarray(r, r + n)),
-                                (a.usedBytes = n),
+                                (s.contents = t.subarray(r, r + n)),
+                                (s.usedBytes = n),
                                 n
                               );
-                            if (0 === a.usedBytes && 0 === o)
+                            if (0 === s.usedBytes && 0 === o)
                               return (
-                                (a.contents = t.slice(r, r + n)),
-                                (a.usedBytes = n),
+                                (s.contents = t.slice(r, r + n)),
+                                (s.usedBytes = n),
                                 n
                               );
-                            if (o + n <= a.usedBytes)
-                              return a.contents.set(t.subarray(r, r + n), o), n;
+                            if (o + n <= s.usedBytes)
+                              return s.contents.set(t.subarray(r, r + n), o), n;
                           }
                           if (
-                            (we.expandFileStorage(a, o + n),
-                            a.contents.subarray && t.subarray)
+                            (we.expandFileStorage(s, o + n),
+                            s.contents.subarray && t.subarray)
                           )
-                            a.contents.set(t.subarray(r, r + n), o);
+                            s.contents.set(t.subarray(r, r + n), o);
                           else
-                            for (var s = 0; s < n; s++)
-                              a.contents[o + s] = t[r + s];
+                            for (var a = 0; a < n; a++)
+                              s.contents[o + a] = t[r + a];
                           return (
-                            (a.usedBytes = Math.max(a.usedBytes, o + n)), n
+                            (s.usedBytes = Math.max(s.usedBytes, o + n)), n
                           );
                         },
                         llseek: function (e, t, r) {
@@ -3093,22 +2609,22 @@
                           if (0 !== t) throw new Ee.ErrnoError(28);
                           if (!Ee.isFile(e.node.mode))
                             throw new Ee.ErrnoError(43);
-                          var a,
-                            s,
+                          var s,
+                            a,
                             u = e.node.contents;
-                          if (2 & i || u.buffer !== T) {
+                          if (2 & i || u.buffer !== j) {
                             if (
                               ((n > 0 || n + r < u.length) &&
                                 (u = u.subarray
                                   ? u.subarray(n, n + r)
                                   : Array.prototype.slice.call(u, n, n + r)),
-                              (s = !0),
-                              !(a = ye(r)))
+                              (a = !0),
+                              !(s = ye(r)))
                             )
                               throw new Ee.ErrnoError(48);
-                            O.set(u, a);
-                          } else (s = !1), (a = u.byteOffset);
-                          return { ptr: a, allocated: s };
+                            O.set(u, s);
+                          } else (a = !1), (s = u.byteOffset);
+                          return { ptr: s, allocated: a };
                         },
                         msync: function (e, t, r, n, o) {
                           if (!Ee.isFile(e.node.mode))
@@ -3136,7 +2652,7 @@
                       filesystems: null,
                       syncFSRequests: 0,
                       lookupPath: function (e, t) {
-                        if (((t = t || {}), !(e = ve.resolve(Ee.cwd(), e))))
+                        if (((t = t || {}), !(e = ge.resolve(Ee.cwd(), e))))
                           return { path: "", node: null };
                         var r = { follow_mount: !0, recurse_count: 0 };
                         for (var n in r) void 0 === t[n] && (t[n] = r[n]);
@@ -3149,26 +2665,26 @@
                               !1
                             ),
                             i = Ee.root,
-                            a = "/",
-                            s = 0;
-                          s < o.length;
-                          s++
+                            s = "/",
+                            a = 0;
+                          a < o.length;
+                          a++
                         ) {
-                          var u = s === o.length - 1;
+                          var u = a === o.length - 1;
                           if (u && t.parent) break;
                           if (
-                            ((i = Ee.lookupNode(i, o[s])),
-                            (a = _e.join2(a, o[s])),
+                            ((i = Ee.lookupNode(i, o[a])),
+                            (s = _e.join2(s, o[a])),
                             Ee.isMountpoint(i) &&
                               (!u || (u && t.follow_mount)) &&
                               (i = i.mounted.root),
                             !u || t.follow)
                           )
                             for (var l = 0; Ee.isLink(i.mode); ) {
-                              var c = Ee.readlink(a);
+                              var c = Ee.readlink(s);
                               if (
-                                ((a = ve.resolve(_e.dirname(a), c)),
-                                (i = Ee.lookupPath(a, {
+                                ((s = ge.resolve(_e.dirname(s), c)),
+                                (i = Ee.lookupPath(s, {
                                   recurse_count: t.recurse_count,
                                 }).node),
                                 l++ > 40)
@@ -3176,7 +2692,7 @@
                                 throw new Ee.ErrnoError(32);
                             }
                         }
-                        return { path: a, node: i };
+                        return { path: s, node: i };
                       },
                       getPath: function (e) {
                         for (var t; ; ) {
@@ -3438,21 +2954,21 @@
                           i = !r;
                         if (o && Ee.root) throw new Ee.ErrnoError(10);
                         if (!o && !i) {
-                          var a = Ee.lookupPath(r, { follow_mount: !1 });
-                          if (((r = a.path), (n = a.node), Ee.isMountpoint(n)))
+                          var s = Ee.lookupPath(r, { follow_mount: !1 });
+                          if (((r = s.path), (n = s.node), Ee.isMountpoint(n)))
                             throw new Ee.ErrnoError(10);
                           if (!Ee.isDir(n.mode)) throw new Ee.ErrnoError(54);
                         }
-                        var s = { type: e, opts: t, mountpoint: r, mounts: [] },
-                          u = e.mount(s);
+                        var a = { type: e, opts: t, mountpoint: r, mounts: [] },
+                          u = e.mount(a);
                         return (
-                          (u.mount = s),
-                          (s.root = u),
+                          (u.mount = a),
+                          (a.root = u),
                           o
                             ? (Ee.root = u)
                             : n &&
-                              ((n.mounted = s),
-                              n.mount && n.mount.mounts.push(s)),
+                              ((n.mounted = a),
+                              n.mount && n.mount.mounts.push(a)),
                           u
                         );
                       },
@@ -3525,7 +3041,7 @@
                         );
                       },
                       symlink: function (e, t) {
-                        if (!ve.resolve(e)) throw new Ee.ErrnoError(44);
+                        if (!ge.resolve(e)) throw new Ee.ErrnoError(44);
                         var r = Ee.lookupPath(t, { parent: !0 }).node;
                         if (!r) throw new Ee.ErrnoError(44);
                         var n = _e.basename(t),
@@ -3539,8 +3055,8 @@
                           n,
                           o = _e.dirname(e),
                           i = _e.dirname(t),
-                          a = _e.basename(e),
-                          s = _e.basename(t);
+                          s = _e.basename(e),
+                          a = _e.basename(t);
                         if (
                           ((r = Ee.lookupPath(e, { parent: !0 }).node),
                           (n = Ee.lookupPath(t, { parent: !0 }).node),
@@ -3549,20 +3065,20 @@
                           throw new Ee.ErrnoError(44);
                         if (r.mount !== n.mount) throw new Ee.ErrnoError(75);
                         var u,
-                          l = Ee.lookupNode(r, a),
-                          c = ve.relative(e, i);
+                          l = Ee.lookupNode(r, s),
+                          c = ge.relative(e, i);
                         if ("." !== c.charAt(0)) throw new Ee.ErrnoError(28);
-                        if ("." !== (c = ve.relative(t, o)).charAt(0))
+                        if ("." !== (c = ge.relative(t, o)).charAt(0))
                           throw new Ee.ErrnoError(55);
                         try {
-                          u = Ee.lookupNode(n, s);
+                          u = Ee.lookupNode(n, a);
                         } catch (e) {}
                         if (l !== u) {
                           var f = Ee.isDir(l.mode),
-                            d = Ee.mayDelete(r, a, f);
+                            d = Ee.mayDelete(r, s, f);
                           if (d) throw new Ee.ErrnoError(d);
                           if (
-                            (d = u ? Ee.mayDelete(n, s, f) : Ee.mayCreate(n, s))
+                            (d = u ? Ee.mayDelete(n, a, f) : Ee.mayCreate(n, a))
                           )
                             throw new Ee.ErrnoError(d);
                           if (!r.node_ops.rename) throw new Ee.ErrnoError(63);
@@ -3585,7 +3101,7 @@
                           }
                           Ee.hashRemoveNode(l);
                           try {
-                            r.node_ops.rename(l, n, s);
+                            r.node_ops.rename(l, n, a);
                           } catch (e) {
                             throw e;
                           } finally {
@@ -3679,7 +3195,7 @@
                         var t = Ee.lookupPath(e).node;
                         if (!t) throw new Ee.ErrnoError(44);
                         if (!t.node_ops.readlink) throw new Ee.ErrnoError(28);
-                        return ve.resolve(
+                        return ge.resolve(
                           Ee.getPath(t.parent),
                           t.node_ops.readlink(t)
                         );
@@ -3766,7 +3282,7 @@
                       },
                       open: function (e, t, r, n, o) {
                         if ("" === e) throw new Ee.ErrnoError(44);
-                        var a;
+                        var s;
                         if (
                           ((r = void 0 === r ? 438 : r),
                           (r =
@@ -3779,39 +3295,39 @@
                               : 0),
                           "object" == typeof e)
                         )
-                          a = e;
+                          s = e;
                         else {
                           e = _e.normalize(e);
                           try {
-                            a = Ee.lookupPath(e, {
+                            s = Ee.lookupPath(e, {
                               follow: !(131072 & t),
                             }).node;
                           } catch (e) {}
                         }
-                        var s = !1;
+                        var a = !1;
                         if (64 & t)
-                          if (a) {
+                          if (s) {
                             if (128 & t) throw new Ee.ErrnoError(20);
-                          } else (a = Ee.mknod(e, r, 0)), (s = !0);
-                        if (!a) throw new Ee.ErrnoError(44);
+                          } else (s = Ee.mknod(e, r, 0)), (a = !0);
+                        if (!s) throw new Ee.ErrnoError(44);
                         if (
-                          (Ee.isChrdev(a.mode) && (t &= -513),
-                          65536 & t && !Ee.isDir(a.mode))
+                          (Ee.isChrdev(s.mode) && (t &= -513),
+                          65536 & t && !Ee.isDir(s.mode))
                         )
                           throw new Ee.ErrnoError(54);
-                        if (!s) {
-                          var u = Ee.mayOpen(a, t);
+                        if (!a) {
+                          var u = Ee.mayOpen(s, t);
                           if (u) throw new Ee.ErrnoError(u);
                         }
-                        512 & t && Ee.truncate(a, 0), (t &= -131713);
+                        512 & t && Ee.truncate(s, 0), (t &= -131713);
                         var l = Ee.createStream(
                           {
-                            node: a,
-                            path: Ee.getPath(a),
+                            node: s,
+                            path: Ee.getPath(s),
                             flags: t,
                             seekable: !0,
                             position: 0,
-                            stream_ops: a.stream_ops,
+                            stream_ops: s.stream_ops,
                             ungotten: [],
                             error: !1,
                           },
@@ -3884,8 +3400,8 @@
                         if (i) {
                           if (!e.seekable) throw new Ee.ErrnoError(70);
                         } else o = e.position;
-                        var a = e.stream_ops.read(e, t, r, n, o);
-                        return i || (e.position += a), a;
+                        var s = e.stream_ops.read(e, t, r, n, o);
+                        return i || (e.position += s), s;
                       },
                       write: function (e, t, r, n, o, i) {
                         if (n < 0 || o < 0) throw new Ee.ErrnoError(28);
@@ -3895,12 +3411,12 @@
                         if (Ee.isDir(e.node.mode)) throw new Ee.ErrnoError(31);
                         if (!e.stream_ops.write) throw new Ee.ErrnoError(28);
                         e.seekable && 1024 & e.flags && Ee.llseek(e, 0, 2);
-                        var a = void 0 !== o;
-                        if (a) {
+                        var s = void 0 !== o;
+                        if (s) {
                           if (!e.seekable) throw new Ee.ErrnoError(70);
                         } else o = e.position;
-                        var s = e.stream_ops.write(e, t, r, n, o, i);
-                        a || (e.position += s);
+                        var a = e.stream_ops.write(e, t, r, n, o, i);
+                        s || (e.position += a);
                         try {
                           e.path &&
                             Ee.trackingDelegate.onWriteToFile &&
@@ -3913,7 +3429,7 @@
                               t.message
                           );
                         }
-                        return s;
+                        return a;
                       },
                       allocate: function (e, t, r) {
                         if (Ee.isClosed(e)) throw new Ee.ErrnoError(8);
@@ -3976,8 +3492,8 @@
                         (r = r || {}).flags = r.flags || 577;
                         var n = Ee.open(e, r.flags, r.mode);
                         if ("string" == typeof t) {
-                          var o = new Uint8Array(K(t) + 1),
-                            i = G(t, o, 0, o.length);
+                          var o = new Uint8Array($(t) + 1),
+                            i = X(t, o, 0, o.length);
                           Ee.write(n, o, 0, i, void 0, r.canOwn);
                         } else {
                           if (!ArrayBuffer.isView(t))
@@ -4013,8 +3529,8 @@
                             },
                           }),
                           Ee.mkdev("/dev/null", Ee.makedev(1, 3)),
-                          ge.register(Ee.makedev(5, 0), ge.default_tty_ops),
-                          ge.register(Ee.makedev(6, 0), ge.default_tty1_ops),
+                          ve.register(Ee.makedev(5, 0), ve.default_tty_ops),
+                          ve.register(Ee.makedev(6, 0), ve.default_tty1_ops),
                           Ee.mkdev("/dev/tty", Ee.makedev(5, 0)),
                           Ee.mkdev("/dev/tty1", Ee.makedev(6, 0));
                         var e = (function () {
@@ -4027,7 +3543,7 @@
                               return crypto.getRandomValues(e), e[0];
                             };
                           }
-                          if (g)
+                          if (v)
                             try {
                               var t = r(821);
                               return function () {
@@ -4180,32 +3696,32 @@
                         for (var o = t.split("/").reverse(); o.length; ) {
                           var i = o.pop();
                           if (i) {
-                            var a = _e.join2(e, i);
+                            var s = _e.join2(e, i);
                             try {
-                              Ee.mkdir(a);
+                              Ee.mkdir(s);
                             } catch (e) {}
-                            e = a;
+                            e = s;
                           }
                         }
-                        return a;
+                        return s;
                       },
                       createFile: function (e, t, r, n, o) {
                         var i = _e.join2(
                             "string" == typeof e ? e : Ee.getPath(e),
                             t
                           ),
-                          a = Ee.getMode(n, o);
-                        return Ee.create(i, a);
+                          s = Ee.getMode(n, o);
+                        return Ee.create(i, s);
                       },
                       createDataFile: function (e, t, r, n, o, i) {
-                        var a = t
+                        var s = t
                             ? _e.join2(
                                 "string" == typeof e ? e : Ee.getPath(e),
                                 t
                               )
                             : e,
-                          s = Ee.getMode(n, o),
-                          u = Ee.create(a, s);
+                          a = Ee.getMode(n, o),
+                          u = Ee.create(s, a);
                         if (r) {
                           if ("string" == typeof r) {
                             for (
@@ -4216,11 +3732,11 @@
                               l[c] = r.charCodeAt(c);
                             r = l;
                           }
-                          Ee.chmod(u, 146 | s);
+                          Ee.chmod(u, 146 | a);
                           var d = Ee.open(u, 577);
                           Ee.write(d, r, 0, r.length, 0, i),
                             Ee.close(d),
-                            Ee.chmod(u, s);
+                            Ee.chmod(u, a);
                         }
                         return u;
                       },
@@ -4231,9 +3747,9 @@
                           ),
                           i = Ee.getMode(!!r, !!n);
                         Ee.createDevice.major || (Ee.createDevice.major = 64);
-                        var a = Ee.makedev(Ee.createDevice.major++, 0);
+                        var s = Ee.makedev(Ee.createDevice.major++, 0);
                         return (
-                          Ee.registerDevice(a, {
+                          Ee.registerDevice(s, {
                             open: function (e) {
                               e.seekable = !1;
                             },
@@ -4241,31 +3757,31 @@
                               n && n.buffer && n.buffer.length && n(10);
                             },
                             read: function (e, t, n, o, i) {
-                              for (var a = 0, s = 0; s < o; s++) {
+                              for (var s = 0, a = 0; a < o; a++) {
                                 var u;
                                 try {
                                   u = r();
                                 } catch (e) {
                                   throw new Ee.ErrnoError(29);
                                 }
-                                if (void 0 === u && 0 === a)
+                                if (void 0 === u && 0 === s)
                                   throw new Ee.ErrnoError(6);
                                 if (null == u) break;
-                                a++, (t[n + s] = u);
+                                s++, (t[n + a] = u);
                               }
-                              return a && (e.node.timestamp = Date.now()), a;
+                              return s && (e.node.timestamp = Date.now()), s;
                             },
                             write: function (e, t, r, o, i) {
-                              for (var a = 0; a < o; a++)
+                              for (var s = 0; s < o; s++)
                                 try {
-                                  n(t[r + a]);
+                                  n(t[r + s]);
                                 } catch (e) {
                                   throw new Ee.ErrnoError(29);
                                 }
-                              return o && (e.node.timestamp = Date.now()), a;
+                              return o && (e.node.timestamp = Date.now()), s;
                             },
                           }),
-                          Ee.mkdev(o, i, a)
+                          Ee.mkdev(o, i, s)
                         );
                       },
                       forceLoadFile: function (e) {
@@ -4280,7 +3796,7 @@
                             "Cannot load without read() or XMLHttpRequest."
                           );
                         try {
-                          (e.contents = Fe(l(e.url), !0)),
+                          (e.contents = Pe(l(e.url), !0)),
                             (e.usedBytes = e.contents.length);
                         } catch (e) {
                           throw new Ee.ErrnoError(29);
@@ -4322,16 +3838,16 @@
                               i =
                                 (t = e.getResponseHeader("Content-Encoding")) &&
                                 "gzip" === t,
-                              a = 1048576;
-                            o || (a = n);
-                            var s = this;
-                            s.setDataGetter(function (e) {
-                              var t = e * a,
-                                o = (e + 1) * a - 1;
+                              s = 1048576;
+                            o || (s = n);
+                            var a = this;
+                            a.setDataGetter(function (e) {
+                              var t = e * s,
+                                o = (e + 1) * s - 1;
                               if (
                                 ((o = Math.min(o, n - 1)),
-                                void 0 === s.chunks[e] &&
-                                  (s.chunks[e] = (function (e, t) {
+                                void 0 === a.chunks[e] &&
+                                  (a.chunks[e] = (function (e, t) {
                                     if (e > t)
                                       throw new Error(
                                         "invalid range (" +
@@ -4349,7 +3865,7 @@
                                     var o = new XMLHttpRequest();
                                     if (
                                       (o.open("GET", r, !1),
-                                      n !== a &&
+                                      n !== s &&
                                         o.setRequestHeader(
                                           "Range",
                                           "bytes=" + e + "-" + t
@@ -4374,30 +3890,30 @@
                                       );
                                     return void 0 !== o.response
                                       ? new Uint8Array(o.response || [])
-                                      : Fe(o.responseText || "", !0);
+                                      : Pe(o.responseText || "", !0);
                                   })(t, o)),
-                                void 0 === s.chunks[e])
+                                void 0 === a.chunks[e])
                               )
                                 throw new Error("doXHR failed!");
-                              return s.chunks[e];
+                              return a.chunks[e];
                             }),
                               (!i && n) ||
-                                ((a = n = 1),
+                                ((s = n = 1),
                                 (n = this.getter(0).length),
-                                (a = n),
+                                (s = n),
                                 b(
                                   "LazyFiles on gzip forces download of the whole file when length is accessed"
                                 )),
                               (this._length = n),
-                              (this._chunkSize = a),
+                              (this._chunkSize = s),
                               (this.lengthKnown = !0);
                           }),
                           "undefined" != typeof XMLHttpRequest)
                         ) {
-                          if (!v)
+                          if (!g)
                             throw "Cannot do synchronous binary XHRs outside webworkers in modern browsers. Use --embed-file or --preload-file in emcc";
-                          var a = new i();
-                          Object.defineProperties(a, {
+                          var s = new i();
+                          Object.defineProperties(s, {
                             length: {
                               get: function () {
                                 return (
@@ -4415,12 +3931,12 @@
                               },
                             },
                           });
-                          var s = { isDevice: !1, contents: a };
-                        } else s = { isDevice: !1, url: r };
-                        var u = Ee.createFile(e, t, s, n, o);
-                        s.contents
-                          ? (u.contents = s.contents)
-                          : s.url && ((u.contents = null), (u.url = s.url)),
+                          var a = { isDevice: !1, contents: s };
+                        } else a = { isDevice: !1, url: r };
+                        var u = Ee.createFile(e, t, a, n, o);
+                        a.contents
+                          ? (u.contents = a.contents)
+                          : a.url && ((u.contents = null), (u.url = a.url)),
                           Object.defineProperties(u, {
                             usedBytes: {
                               get: function () {
@@ -4442,12 +3958,12 @@
                             Ee.forceLoadFile(u);
                             var i = e.node.contents;
                             if (o >= i.length) return 0;
-                            var a = Math.min(i.length - o, n);
+                            var s = Math.min(i.length - o, n);
                             if (i.slice)
-                              for (var s = 0; s < a; s++) t[r + s] = i[o + s];
+                              for (var a = 0; a < s; a++) t[r + a] = i[o + a];
                             else
-                              for (s = 0; s < a; s++) t[r + s] = i.get(o + s);
-                            return a;
+                              for (a = 0; a < s; a++) t[r + a] = i.get(o + a);
+                            return s;
                           }),
                           (u.stream_ops = l),
                           u
@@ -4459,19 +3975,19 @@
                         r,
                         n,
                         o,
-                        a,
                         s,
+                        a,
                         u,
                         l,
                         f
                       ) {
                         Browser.init();
-                        var d = t ? ve.resolve(_e.join2(e, t)) : e;
+                        var d = t ? ge.resolve(_e.join2(e, t)) : e;
                         function h(r) {
                           function c(r) {
                             f && f(),
                               u || Ee.createDataFile(e, t, r, n, o, l),
-                              a && a(),
+                              s && s(),
                               le();
                           }
                           var h = !1;
@@ -4479,7 +3995,7 @@
                             h ||
                               (e.canHandle(d) &&
                                 (e.handle(r, d, c, function () {
-                                  s && s(), le();
+                                  a && a(), le();
                                 }),
                                 (h = !0)));
                           }),
@@ -4492,7 +4008,7 @@
                                 c(
                                   e,
                                   function (t) {
-                                    M(
+                                    A(
                                       t,
                                       'Loading data file "' +
                                         e +
@@ -4510,7 +4026,7 @@
                                   }
                                 ),
                                   o && ue();
-                              })(r, 0, s)
+                              })(r, 0, a)
                             : h(r);
                       },
                       indexedDB: function () {
@@ -4544,11 +4060,11 @@
                                 "readwrite"
                               ),
                               i = n.objectStore(Ee.DB_STORE_NAME),
-                              a = 0,
                               s = 0,
+                              a = 0,
                               u = e.length;
                             function l() {
-                              0 == s ? t() : r();
+                              0 == a ? t() : r();
                             }
                             e.forEach(function (e) {
                               var t = i.put(
@@ -4556,10 +4072,10 @@
                                 e
                               );
                               (t.onsuccess = function () {
-                                ++a + s == u && l();
+                                ++s + a == u && l();
                               }),
                                 (t.onerror = function () {
-                                  s++, a + s == u && l();
+                                  a++, s + a == u && l();
                                 });
                             }),
                               (n.onerror = r);
@@ -4585,15 +4101,15 @@
                             } catch (e) {
                               return void r(e);
                             }
-                            var a = i.objectStore(Ee.DB_STORE_NAME),
-                              s = 0,
+                            var s = i.objectStore(Ee.DB_STORE_NAME),
+                              a = 0,
                               u = 0,
                               l = e.length;
                             function c() {
                               0 == u ? t() : r();
                             }
                             e.forEach(function (e) {
-                              var t = a.get(e);
+                              var t = s.get(e);
                               (t.onsuccess = function () {
                                 Ee.analyzePath(e).exists && Ee.unlink(e),
                                   Ee.createDataFile(
@@ -4604,10 +4120,10 @@
                                     !0,
                                     !0
                                   ),
-                                  ++s + u == l && c();
+                                  ++a + u == l && c();
                               }),
                                 (t.onerror = function () {
-                                  u++, s + u == l && c();
+                                  u++, a + u == l && c();
                                 });
                             }),
                               (i.onerror = r);
@@ -4647,15 +4163,15 @@
                           throw e;
                         }
                         return (
-                          (H[r >> 2] = n.dev),
-                          (H[(r + 4) >> 2] = 0),
-                          (H[(r + 8) >> 2] = n.ino),
-                          (H[(r + 12) >> 2] = n.mode),
-                          (H[(r + 16) >> 2] = n.nlink),
-                          (H[(r + 20) >> 2] = n.uid),
-                          (H[(r + 24) >> 2] = n.gid),
-                          (H[(r + 28) >> 2] = n.rdev),
-                          (H[(r + 32) >> 2] = 0),
+                          (N[r >> 2] = n.dev),
+                          (N[(r + 4) >> 2] = 0),
+                          (N[(r + 8) >> 2] = n.ino),
+                          (N[(r + 12) >> 2] = n.mode),
+                          (N[(r + 16) >> 2] = n.nlink),
+                          (N[(r + 20) >> 2] = n.uid),
+                          (N[(r + 24) >> 2] = n.gid),
+                          (N[(r + 28) >> 2] = n.rdev),
+                          (N[(r + 32) >> 2] = 0),
                           (te = [
                             n.size >>> 0,
                             ((ee = n.size),
@@ -4672,16 +4188,16 @@
                                   ) >>> 0
                               : 0),
                           ]),
-                          (H[(r + 40) >> 2] = te[0]),
-                          (H[(r + 44) >> 2] = te[1]),
-                          (H[(r + 48) >> 2] = 4096),
-                          (H[(r + 52) >> 2] = n.blocks),
-                          (H[(r + 56) >> 2] = (n.atime.getTime() / 1e3) | 0),
-                          (H[(r + 60) >> 2] = 0),
-                          (H[(r + 64) >> 2] = (n.mtime.getTime() / 1e3) | 0),
-                          (H[(r + 68) >> 2] = 0),
-                          (H[(r + 72) >> 2] = (n.ctime.getTime() / 1e3) | 0),
-                          (H[(r + 76) >> 2] = 0),
+                          (N[(r + 40) >> 2] = te[0]),
+                          (N[(r + 44) >> 2] = te[1]),
+                          (N[(r + 48) >> 2] = 4096),
+                          (N[(r + 52) >> 2] = n.blocks),
+                          (N[(r + 56) >> 2] = (n.atime.getTime() / 1e3) | 0),
+                          (N[(r + 60) >> 2] = 0),
+                          (N[(r + 64) >> 2] = (n.mtime.getTime() / 1e3) | 0),
+                          (N[(r + 68) >> 2] = 0),
+                          (N[(r + 72) >> 2] = (n.ctime.getTime() / 1e3) | 0),
+                          (N[(r + 76) >> 2] = 0),
                           (te = [
                             n.ino >>> 0,
                             ((ee = n.ino),
@@ -4698,8 +4214,8 @@
                                   ) >>> 0
                               : 0),
                           ]),
-                          (H[(r + 80) >> 2] = te[0]),
-                          (H[(r + 84) >> 2] = te[1]),
+                          (N[(r + 80) >> 2] = te[0]),
+                          (N[(r + 84) >> 2] = te[1]),
                           0
                         );
                       },
@@ -4731,9 +4247,9 @@
                       doReadlink: function (e, t, r) {
                         if (r <= 0) return -28;
                         var n = Ee.readlink(e),
-                          o = Math.min(r, K(n)),
+                          o = Math.min(r, $(n)),
                           i = O[t + o];
-                        return X(n, t, r + 1), (O[t + o] = i), o;
+                        return G(n, t, r + 1), (O[t + o] = i), o;
                       },
                       doAccess: function (e, t) {
                         if (-8 & t) return -28;
@@ -4754,19 +4270,19 @@
                       },
                       doReadv: function (e, t, r, n) {
                         for (var o = 0, i = 0; i < r; i++) {
-                          var a = H[(t + 8 * i) >> 2],
-                            s = H[(t + (8 * i + 4)) >> 2],
-                            u = Ee.read(e, O, a, s, n);
+                          var s = N[(t + 8 * i) >> 2],
+                            a = N[(t + (8 * i + 4)) >> 2],
+                            u = Ee.read(e, O, s, a, n);
                           if (u < 0) return -1;
-                          if (((o += u), u < s)) break;
+                          if (((o += u), u < a)) break;
                         }
                         return o;
                       },
                       doWritev: function (e, t, r, n) {
                         for (var o = 0, i = 0; i < r; i++) {
-                          var a = H[(t + 8 * i) >> 2],
-                            s = H[(t + (8 * i + 4)) >> 2],
-                            u = Ee.write(e, O, a, s, n);
+                          var s = N[(t + 8 * i) >> 2],
+                            a = N[(t + (8 * i + 4)) >> 2],
+                            u = Ee.write(e, O, s, a, n);
                           if (u < 0) return -1;
                           o += u;
                         }
@@ -4774,7 +4290,7 @@
                       },
                       varargs: void 0,
                       get: function () {
-                        return (ke.varargs += 4), H[(ke.varargs - 4) >> 2];
+                        return (ke.varargs += 4), N[(ke.varargs - 4) >> 2];
                       },
                       getStr: function (e) {
                         return V(e);
@@ -4789,18 +4305,18 @@
                       },
                     };
                   function Se(e) {
-                    return (H[Re() >> 2] = e), e;
+                    return (N[Re() >> 2] = e), e;
                   }
-                  function xe(e) {
+                  function qe(e) {
                     try {
                       return (
-                        S.grow((e - T.byteLength + 65535) >>> 16),
-                        Q(S.buffer),
+                        D.grow((e - j.byteLength + 65535) >>> 16),
+                        Y(D.buffer),
                         1
                       );
                     } catch (e) {}
                   }
-                  be = g
+                  be = v
                     ? function () {
                         var e = process.hrtime();
                         return 1e3 * e[0] + e[1] / 1e6;
@@ -4808,7 +4324,7 @@
                     : function () {
                         return performance.now();
                       };
-                  var qe = {};
+                  var xe = {};
                   function De() {
                     if (!De.strings) {
                       var e = {
@@ -4826,15 +4342,15 @@
                           ).replace("-", "_") + ".UTF-8",
                         _: m || "./this.program",
                       };
-                      for (var t in qe)
-                        void 0 === qe[t] ? delete e[t] : (e[t] = qe[t]);
+                      for (var t in xe)
+                        void 0 === xe[t] ? delete e[t] : (e[t] = xe[t]);
                       var r = [];
                       for (var t in e) r.push(t + "=" + e[t]);
                       De.strings = r;
                     }
                     return De.strings;
                   }
-                  var Pe = function (e, t, r, n) {
+                  var Fe = function (e, t, r, n) {
                     e || (e = this),
                       (this.parent = e),
                       (this.mount = e.mount),
@@ -4846,13 +4362,13 @@
                       (this.stream_ops = {}),
                       (this.rdev = n);
                   };
-                  function Fe(e, t, r) {
-                    var n = r > 0 ? r : K(e) + 1,
+                  function Pe(e, t, r) {
+                    var n = r > 0 ? r : $(e) + 1,
                       o = new Array(n),
-                      i = G(e, o, 0, o.length);
+                      i = X(e, o, 0, o.length);
                     return t && (o.length = i), o;
                   }
-                  Object.defineProperties(Pe.prototype, {
+                  Object.defineProperties(Fe.prototype, {
                     read: {
                       get: function () {
                         return 365 == (365 & this.mode);
@@ -4880,10 +4396,10 @@
                       },
                     },
                   }),
-                    (Ee.FSNode = Pe),
+                    (Ee.FSNode = Fe),
                     Ee.staticInit();
-                  var Ae,
-                    Me = {
+                  var Me,
+                    Ae = {
                       a: function (e, t, r, n) {
                         ce(
                           "Assertion failed: " +
@@ -4899,31 +4415,31 @@
                       t: function (e, t) {
                         return (function (e, t) {
                           me();
-                          var r = new Date(1e3 * H[e >> 2]);
-                          (H[t >> 2] = r.getSeconds()),
-                            (H[(t + 4) >> 2] = r.getMinutes()),
-                            (H[(t + 8) >> 2] = r.getHours()),
-                            (H[(t + 12) >> 2] = r.getDate()),
-                            (H[(t + 16) >> 2] = r.getMonth()),
-                            (H[(t + 20) >> 2] = r.getFullYear() - 1900),
-                            (H[(t + 24) >> 2] = r.getDay());
+                          var r = new Date(1e3 * N[e >> 2]);
+                          (N[t >> 2] = r.getSeconds()),
+                            (N[(t + 4) >> 2] = r.getMinutes()),
+                            (N[(t + 8) >> 2] = r.getHours()),
+                            (N[(t + 12) >> 2] = r.getDate()),
+                            (N[(t + 16) >> 2] = r.getMonth()),
+                            (N[(t + 20) >> 2] = r.getFullYear() - 1900),
+                            (N[(t + 24) >> 2] = r.getDay());
                           var n = new Date(r.getFullYear(), 0, 1),
                             o = ((r.getTime() - n.getTime()) / 864e5) | 0;
-                          (H[(t + 28) >> 2] = o),
-                            (H[(t + 36) >> 2] = -60 * r.getTimezoneOffset());
+                          (N[(t + 28) >> 2] = o),
+                            (N[(t + 36) >> 2] = -60 * r.getTimezoneOffset());
                           var i = new Date(
                               r.getFullYear(),
                               6,
                               1
                             ).getTimezoneOffset(),
-                            a = n.getTimezoneOffset(),
-                            s =
+                            s = n.getTimezoneOffset(),
+                            a =
                               0 |
-                              (i != a &&
-                                r.getTimezoneOffset() == Math.min(a, i));
-                          H[(t + 32) >> 2] = s;
-                          var u = H[(Ce() + (s ? 4 : 0)) >> 2];
-                          return (H[(t + 40) >> 2] = u), t;
+                              (i != s &&
+                                r.getTimezoneOffset() == Math.min(s, i));
+                          N[(t + 32) >> 2] = a;
+                          var u = N[(Ce() + (a ? 4 : 0)) >> 2];
+                          return (N[(t + 40) >> 2] = u), t;
                         })(e, t);
                       },
                       G: function (e, t) {
@@ -4992,8 +4508,6 @@
                                 : Ee.open(n.path, n.flags, 0, o).fd;
                             case 1:
                             case 2:
-                            case 13:
-                            case 14:
                               return 0;
                             case 3:
                               return n.flags;
@@ -5002,12 +4516,16 @@
                               return (n.flags |= o), 0;
                             case 12:
                               return (o = ke.get()), (L[(o + 0) >> 1] = 2), 0;
+                            case 13:
+                            case 14:
+                              return 0;
                             case 16:
                             case 8:
-                            default:
                               return -28;
                             case 9:
                               return Se(28), -1;
+                            default:
+                              return -28;
                           }
                         } catch (e) {
                           return (
@@ -5045,7 +4563,7 @@
                         try {
                           if (0 === t) return -28;
                           var r = Ee.cwd();
-                          return t < K(r) + 1 ? -68 : (X(r, e, t), e);
+                          return t < $(r) + 1 ? -68 : (G(r, e, t), e);
                         } catch (e) {
                           return (
                             (void 0 !== Ee && e instanceof Ee.ErrnoError) ||
@@ -5085,30 +4603,30 @@
                       A: function (e, t, r, n, o, i) {
                         try {
                           return (function (e, t, r, n, o, i) {
-                            var a;
+                            var s;
                             i <<= 12;
-                            var s = !1;
+                            var a = !1;
                             if (0 != (16 & n) && e % 65536 != 0) return -28;
                             if (0 != (32 & n)) {
-                              if (!(a = ye(t))) return -48;
-                              s = !0;
+                              if (!(s = ye(t))) return -48;
+                              a = !0;
                             } else {
                               var u = Ee.getStream(o);
                               if (!u) return -8;
                               var l = Ee.mmap(u, e, t, i, r, n);
-                              (a = l.ptr), (s = l.allocated);
+                              (s = l.ptr), (a = l.allocated);
                             }
                             return (
-                              (ke.mappings[a] = {
-                                malloc: a,
+                              (ke.mappings[s] = {
+                                malloc: s,
                                 len: t,
-                                allocated: s,
+                                allocated: a,
                                 fd: o,
                                 prot: r,
                                 flags: n,
                                 offset: i,
                               }),
-                              a
+                              s
                             );
                           })(e, t, r, n, o, i);
                         } catch (e) {
@@ -5131,7 +4649,7 @@
                                   ke.doMsync(e, n, t, r.flags, r.offset),
                                 Ee.munmap(n)),
                                 (ke.mappings[e] = null),
-                                r.allocated && ze(r.malloc);
+                                r.allocated && Te(r.malloc);
                             }
                             return 0;
                           })(e, t);
@@ -5179,9 +4697,9 @@
                           );
                         }
                       },
-                      e: function e(t, r) {
+                      e: function (e, t) {
                         try {
-                          return (t = ke.getStr(t)), ke.doStat(Ee.stat, t, r);
+                          return (e = ke.getStr(e)), ke.doStat(Ee.stat, e, t);
                         } catch (e) {
                           return (
                             (void 0 !== Ee && e instanceof Ee.ErrnoError) ||
@@ -5216,7 +4734,7 @@
                           var i = r * (1 + 0.2 / o);
                           if (
                             ((i = Math.min(i, e + 100663296)),
-                            xe(
+                            qe(
                               Math.min(
                                 n,
                                 ((t = Math.max(e, i)) % 65536 > 0 &&
@@ -5237,7 +4755,7 @@
                         return (
                           De().forEach(function (n, o) {
                             var i = t + r;
-                            (H[(e + 4 * o) >> 2] = i),
+                            (N[(e + 4 * o) >> 2] = i),
                               (function (e, t, r) {
                                 for (var n = 0; n < e.length; ++n)
                                   O[t++ >> 0] = e.charCodeAt(n);
@@ -5250,13 +4768,13 @@
                       },
                       r: function (e, t) {
                         var r = De();
-                        H[e >> 2] = r.length;
+                        N[e >> 2] = r.length;
                         var n = 0;
                         return (
                           r.forEach(function (e) {
                             n += e.length + 1;
                           }),
-                          (H[t >> 2] = n),
+                          (N[t >> 2] = n),
                           0
                         );
                       },
@@ -5295,7 +4813,7 @@
                         try {
                           var o = ke.getStreamFromFD(e),
                             i = ke.doReadv(o, t, r);
-                          return (H[n >> 2] = i), 0;
+                          return (N[n >> 2] = i), 0;
                         } catch (e) {
                           return (
                             (void 0 !== Ee && e instanceof Ee.ErrnoError) ||
@@ -5304,24 +4822,14 @@
                           );
                         }
                       },
-                      n: (function (e) {
-                        function t(t, r, n, o, i) {
-                          return e.apply(this, arguments);
-                        }
-                        return (
-                          (t.toString = function () {
-                            return e.toString();
-                          }),
-                          t
-                        );
-                      })(function (e, t, r, n, o) {
+                      n: function (e, t, r, n, o) {
                         try {
                           var i = ke.getStreamFromFD(e),
-                            a = 4294967296 * r + (t >>> 0),
-                            s = 9007199254740992;
-                          return a <= -s || a >= s
+                            s = 4294967296 * r + (t >>> 0),
+                            a = 9007199254740992;
+                          return s <= -a || s >= a
                             ? -61
-                            : (Ee.llseek(i, a, n),
+                            : (Ee.llseek(i, s, n),
                               (te = [
                                 i.position >>> 0,
                                 ((ee = i.position),
@@ -5338,10 +4846,10 @@
                                       ) >>> 0
                                   : 0),
                               ]),
-                              (H[o >> 2] = te[0]),
-                              (H[(o + 4) >> 2] = te[1]),
+                              (N[o >> 2] = te[0]),
+                              (N[(o + 4) >> 2] = te[1]),
                               i.getdents &&
-                                0 === a &&
+                                0 === s &&
                                 0 === n &&
                                 (i.getdents = null),
                               0);
@@ -5352,7 +4860,7 @@
                             e.errno
                           );
                         }
-                      }),
+                      },
                       m: function (e) {
                         try {
                           var t = ke.getStreamFromFD(e);
@@ -5371,7 +4879,7 @@
                         try {
                           var o = ke.getStreamFromFD(e),
                             i = ke.doWritev(o, t, r);
-                          return (H[n >> 2] = i), 0;
+                          return (N[n >> 2] = i), 0;
                         } catch (e) {
                           return (
                             (void 0 !== Ee && e instanceof Ee.ErrnoError) ||
@@ -5383,20 +4891,20 @@
                       g: function (e) {
                         var t = Date.now();
                         return (
-                          (H[e >> 2] = (t / 1e3) | 0),
-                          (H[(e + 4) >> 2] = ((t % 1e3) * 1e3) | 0),
+                          (N[e >> 2] = (t / 1e3) | 0),
+                          (N[(e + 4) >> 2] = ((t % 1e3) * 1e3) | 0),
                           0
                         );
                       },
                       K: function (e) {
                         var t = (Date.now() / 1e3) | 0;
-                        return e && (H[e >> 2] = t), t;
+                        return e && (N[e >> 2] = t), t;
                       },
                       C: function (e, t) {
                         var r;
                         if (t) {
                           var n = t + 8;
-                          (r = 1e3 * H[n >> 2]), (r += H[(n + 4) >> 2] / 1e3);
+                          (r = 1e3 * N[n >> 2]), (r += N[(n + 4) >> 2] / 1e3);
                         } else r = Date.now();
                         return (function (e, t) {
                           e = V(e);
@@ -5434,13 +4942,13 @@
                     },
                     Re =
                       ((function () {
-                        var e = { a: Me };
+                        var e = { a: Ae };
                         function t(e, t) {
                           var r,
                             n = e.exports;
                           (i.asm = n),
-                            Q((S = i.asm.L).buffer),
-                            ($ = i.asm.Fa),
+                            Y((D = i.asm.L).buffer),
+                            (Q = i.asm.Fa),
                             (r = i.asm.M),
                             ne.unshift(r),
                             le();
@@ -5450,7 +4958,7 @@
                         }
                         function n(t) {
                           return (function () {
-                            if (!k && (_ || v)) {
+                            if (!k && (_ || g)) {
                               if ("function" == typeof fetch && !de(J))
                                 return fetch(J, { credentials: "same-origin" })
                                   .then(function (e) {
@@ -5550,7 +5058,7 @@
                           arguments
                         );
                       })),
-                    je =
+                    ze =
                       ((i._sqlite3_finalize = function () {
                         return (i._sqlite3_finalize = i.asm.Q).apply(
                           null,
@@ -5796,13 +5304,13 @@
                         );
                       }),
                       (i._malloc = function () {
-                        return (je = i._malloc = i.asm.Da).apply(
+                        return (ze = i._malloc = i.asm.Da).apply(
                           null,
                           arguments
                         );
                       })),
-                    ze = (i._free = function () {
-                      return (ze = i._free = i.asm.Ea).apply(null, arguments);
+                    Te = (i._free = function () {
+                      return (Te = i._free = i.asm.Ea).apply(null, arguments);
                     }),
                     Ce =
                       ((i._RegisterExtensionFunctions = function () {
@@ -5817,8 +5325,8 @@
                           arguments
                         );
                       })),
-                    Te = (i.__get_daylight = function () {
-                      return (Te = i.__get_daylight = i.asm.Ia).apply(
+                    je = (i.__get_daylight = function () {
+                      return (je = i.__get_daylight = i.asm.Ia).apply(
                         null,
                         arguments
                       );
@@ -5841,27 +5349,27 @@
                         arguments
                       );
                     }),
-                    He = (i.stackAlloc = function () {
-                      return (He = i.stackAlloc = i.asm.Ma).apply(
+                    Ne = (i.stackAlloc = function () {
+                      return (Ne = i.stackAlloc = i.asm.Ma).apply(
                         null,
                         arguments
                       );
                     }),
-                    Ne = (i._memalign = function () {
-                      return (Ne = i._memalign = i.asm.Na).apply(
+                    He = (i._memalign = function () {
+                      return (He = i._memalign = i.asm.Na).apply(
                         null,
                         arguments
                       );
                     });
-                  function Ue(e) {
+                  function Ie(e) {
                     function t() {
-                      Ae ||
-                        ((Ae = !0),
+                      Me ||
+                        ((Me = !0),
                         (i.calledRun = !0),
-                        A ||
+                        M ||
                           (i.noFSInit || Ee.init.initialized || Ee.init(),
                           (Ee.ignorePermissions = !1),
-                          ge.init(),
+                          ve.init(),
                           pe(ne),
                           i.onRuntimeInitialized && i.onRuntimeInitialized(),
                           (function () {
@@ -5903,7 +5411,7 @@
                             : t()));
                   }
                   if (
-                    ((i.ccall = j),
+                    ((i.ccall = z),
                     (i.cwrap = function (e, t, r, n) {
                       var o = (r = r || []).every(function (e) {
                         return "number" === e;
@@ -5911,22 +5419,22 @@
                       return "string" !== t && o && !n
                         ? R(e)
                         : function () {
-                            return j(e, t, r, arguments);
+                            return z(e, t, r, arguments);
                           };
                     }),
-                    (i.setValue = P),
-                    (i.getValue = F),
+                    (i.setValue = F),
+                    (i.getValue = P),
                     (i.UTF8ToString = V),
-                    (i.stringToUTF8 = X),
-                    (i.lengthBytesUTF8 = K),
-                    (i.addFunction = D),
+                    (i.stringToUTF8 = G),
+                    (i.lengthBytesUTF8 = $),
+                    (i.addFunction = x),
                     (i.stackSave = Be),
                     (i.stackRestore = Le),
-                    (i.stackAlloc = He),
-                    (se = function e() {
-                      Ae || Ue(), Ae || (se = e);
+                    (i.stackAlloc = Ne),
+                    (ae = function e() {
+                      Me || Ie(), Me || (ae = e);
                     }),
-                    (i.run = Ue),
+                    (i.run = Ie),
                     i.preInit)
                   )
                     for (
@@ -5936,19 +5444,19 @@
 
                     )
                       i.preInit.pop()();
-                  return Ue(), i;
+                  return Ie(), i;
                 }))
               );
             };
           (e.exports = o), (e.exports.default = o);
         },
-        720: function (e, t, r) {
+        720: (e, t, r) => {
           "use strict";
           e.exports = r.p + "sql-wasm.wasm";
         },
-        821: function () {},
-        905: function () {},
-        101: function () {},
+        821: () => {},
+        905: () => {},
+        101: () => {},
       },
       __webpack_module_cache__ = {};
     function __webpack_require__(e) {
@@ -5970,26 +5478,26 @@
         r.exports
       );
     }
-    (__webpack_require__.d = function (e, t) {
+    (__webpack_require__.d = (e, t) => {
       for (var r in t)
         __webpack_require__.o(t, r) &&
           !__webpack_require__.o(e, r) &&
           Object.defineProperty(e, r, { enumerable: !0, get: t[r] });
     }),
-      (__webpack_require__.o = function (e, t) {
-        return Object.prototype.hasOwnProperty.call(e, t);
-      }),
-      (__webpack_require__.r = function (e) {
+      (__webpack_require__.o = (e, t) =>
+        Object.prototype.hasOwnProperty.call(e, t)),
+      (__webpack_require__.r = (e) => {
         "undefined" != typeof Symbol &&
           Symbol.toStringTag &&
           Object.defineProperty(e, Symbol.toStringTag, { value: "Module" }),
           Object.defineProperty(e, "__esModule", { value: !0 });
       }),
-      (__webpack_require__.nmd = function (e) {
-        return (e.paths = []), e.children || (e.children = []), e;
-      }),
+      (__webpack_require__.nmd = (e) => (
+        (e.paths = []), e.children || (e.children = []), e
+      )),
       (__webpack_require__.p = "");
     var __webpack_exports__ = __webpack_require__(630);
     return __webpack_exports__;
   })();
 });
+//# sourceMappingURL=sqlite.worker.js.map
