@@ -1,0 +1,20 @@
+.noUi-connect {
+    background:  #3f50b5;
+}
+
+.noUi-handle {
+    cursor: col-resize;
+    width: 10px !important;
+    right: -5px !important;
+    left: auto;
+    right: -17px; /* The 17 here is half of the 34 width. The - pulls it in the other direction */
+    top: -6px;
+}
+
+.noUi-handle:before {
+    display:none
+}
+
+.noUi-handle:after {
+    display:none
+}

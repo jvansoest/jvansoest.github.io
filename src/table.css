@@ -1,0 +1,11 @@
+table { border-collapse: collapse; white-space: nowrap; }
+tr { display: block; float: left; }
+th { display: block; border: 0px solid rgb(233, 233, 233); padding:4px;}
+td { display: block; border: 1px solid rgb(255, 255, 255); padding:4px;}
+tbody, thead { display: inline-block; }
+
+tbody {
+  /* width: 10000px; */
+  overflow-y: hidden;
+  overflow-x: auto;
+}

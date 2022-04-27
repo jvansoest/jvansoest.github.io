@@ -1,42 +1,17 @@
-import React, { useEffect, useState } from "react";
-import ReactDOM from "react-dom";
+import React from "react";
+import ReactDOM from "react-dom/client";
+import "./index.css";
+import App from "./App";
+import * as serviceWorker from "./serviceWorker";
 
-import { createDbWorker } from "sql.js-httpvfs";
-
-const workerUrl = new URL(
-  "sql.js-httpvfs/dist/sqlite.worker.js",
-  import.meta.url
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(
+  // <React.StrictMode>
+  <App />
+  // </React.StrictMode>
 );
-const wasmUrl = new URL("sql.js-httpvfs/dist/sql-wasm.wasm", import.meta.url);
 
-const App = () => {
-  const [first, setfirst] = useState(null);
-
-  useEffect(() => {
-    async function load() {
-      const worker = await createDbWorker(
-        [
-          {
-            from: "inline",
-            config: {
-              serverMode: "full",
-              url: "/example.sqlite3",
-              requestChunkSize: 4096,
-            },
-          },
-        ],
-        workerUrl.toString(),
-        wasmUrl.toString()
-      );
-
-      const result = await worker.db.query(`select * from mytable`);
-      setfirst(result);
-    }
-
-    load();
-  }, []);
-
-  return <h1>My React and TypeScript App! {JSON.stringify(first)}</h1>;
-};
-
-ReactDOM.render(<App />, document.getElementById("root"));
+// If you want your app to work offline and load faster, you can change
+// unregister() to register() below. Note this comes with some pitfalls.
+// Learn more about service workers: https://cra.link/PWA
+serviceWorker.unregister();
