@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/static/css/main.0347174f.css",
+    "main.js": "/static/js/main.290e32d4.js",
+    "static/media/sql-wasm.wasm": "/static/media/sql-wasm.c74ad46623e4ee643959.wasm",
+    "static/media/sqlite.worker.js": "/static/media/sqlite.worker.b326ede19773c1e83c1b.js",
+    "index.html": "/index.html",
+    "main.0347174f.css.map": "/static/css/main.0347174f.css.map",
+    "main.290e32d4.js.map": "/static/js/main.290e32d4.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.0347174f.css",
+    "static/js/main.290e32d4.js"
+  ]
+}
